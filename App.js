@@ -7,17 +7,22 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useFonts } from "expo-font";
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 import "expo-dev-client";
 
-// import LoginScreen from "./screens/LoginScreen";
+import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import SearchScreen from "./screens/SearchScreen";
 import AppointmentScreen from "./screens/AppointmentScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import PostDetailScreen from "./screens/PostDetailScreen";
+
 import COLORS from "./constants/color";
+import FONTS from "./constants/font";
 
 const CustomTabBarButton = ({ onPress }) => (
   <View
@@ -56,7 +61,7 @@ const TabRoute = () => {
         tabBarActiveTintColor: COLORS.orange,
         tabBarInactiveTintColor: COLORS.grey,
         tabBarLabelStyle: {
-          fontWeight: "500",
+          fontFamily: FONTS.bold,
           fontSize: 12,
           marginBottom: 5,
         },
@@ -87,7 +92,7 @@ const TabRoute = () => {
                   elevation: 4
                 }}
               >
-                <Icon name="home" color="#fff" size={size} />
+                <Icon name="newspaper" color="#fff" size={size} />
               </View>
             ): (<Icon name="home-outline" color={color} size={25} />)
           },
@@ -189,6 +194,18 @@ const TabRoute = () => {
 };
 
 export default function App() {
+
+  const [fontsLoaded, fontError] = useFonts({
+    "OpenSans-Bold": require("./assets/fonts/OpenSans-Bold.ttf"),
+    "OpenSans-Medium": require("./assets/fonts/OpenSans-Medium.ttf"),
+    "OpenSans-SemiBold": require("./assets/fonts/OpenSans-SemiBold.ttf"),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
@@ -196,11 +213,13 @@ export default function App() {
           screenOptions={{ headerShown: false }}
           initialRouteName="Home"
         >
-          {/* <Stack.Screen name="Login" component={LoginScreen} /> */}
+          <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Home" component={TabRoute} />
           <Stack.Screen name="Search" component={SearchScreen} />
           <Stack.Screen name="Appointment" component={AppointmentScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

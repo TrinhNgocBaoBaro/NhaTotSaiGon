@@ -14,6 +14,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import Icon1 from "react-native-vector-icons/FontAwesome";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import FONTS from "../constants/font";
 // import createAxios from "../utils/axios";
 // const API = createAxios();
 
@@ -95,6 +96,7 @@ const ProfileScreen = ({ navigation }) => {
           fontSize: 15,
           minWidth: 250,
           fontWeight: 500,
+          fontFamily: FONTS.semiBold
         }}
       >
         {text}
@@ -129,7 +131,7 @@ const ProfileScreen = ({ navigation }) => {
             </View>
           </Pressable>
           <View style={{ justifyContent: "center" }}>
-            <Text style={{ fontSize: 22, fontWeight: "bold" }}>Tài khoản</Text>
+            <Text style={{ fontSize: 22, fontFamily: FONTS.bold }}>Tài khoản</Text>
           </View>
           <Pressable
             style={{
@@ -152,7 +154,7 @@ const ProfileScreen = ({ navigation }) => {
         <View style={styles.itemCard}>
           <Image
             source={{
-              uri: "https://banner2.cleanpng.com/20180619/epr/kisspng-avatar-photo-booth-computer-icons-email-stewardess-5b292bfebc29e1.5698032815294248947707.jpg",
+              uri: "https://scontent.fsgn15-1.fna.fbcdn.net/v/t39.30808-1/438238559_1143642673426668_6656372791733229549_n.jpg?stp=c2.0.200.200a_dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=-2s72PAG7cEQ7kNvgEXAYaA&_nc_ht=scontent.fsgn15-1.fna&oh=00_AYAE6pxdrTkzfxHAGoHxzJfSAVLf9yEAF-BEkZqeKL7DBw&oe=6660C602",
             }}
             style={{ height: 50, width: 50, borderRadius: 50 }}
           />
@@ -164,10 +166,10 @@ const ProfileScreen = ({ navigation }) => {
               flex: 1,
             }}
           >
-            <Text style={{ fontWeight: "bold", fontSize: 16, fontWeight: 500 }}>
+            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }}>
               Trịnh Ngọc Bảo
             </Text>
-            <Text style={{ fontSize: 13, color: "grey", fontWeight: 500 }}>
+            <Text style={{ fontSize: 13, color: "grey", fontFamily: FONTS.semiBold }}>
               ngbao1592001@gmail.com
             </Text>
           </View>
@@ -178,7 +180,7 @@ const ProfileScreen = ({ navigation }) => {
 
         <View style={{ marginHorizontal: 20 }}>
           <View style={{ marginBottom: 12 }}>
-            <Text style={{ marginVertical: 10, fontWeight: "bold" }}>
+            <Text style={{ marginVertical: 10, fontFamily: FONTS.bold }}>
               Tài khoản
             </Text>
             <View
@@ -210,7 +212,7 @@ const ProfileScreen = ({ navigation }) => {
                     marginLeft: 15,
                     fontSize: 15,
                     minWidth: 250,
-                    fontWeight: 500,
+                    fontFamily: FONTS.semiBold,
                   }}
                 >
                   {"Quyền riêng tư"}
@@ -246,7 +248,7 @@ const ProfileScreen = ({ navigation }) => {
                     marginLeft: 15,
                     fontSize: 15,
                     minWidth: 250,
-                    fontWeight: 500,
+                    fontFamily: FONTS.semiBold,
                   }}
                 >
                   {"Thông tin tài khoản"}
@@ -267,7 +269,7 @@ const ProfileScreen = ({ navigation }) => {
           </View>
 
           <View style={{ marginBottom: 12 }}>
-            <Text style={{ marginVertical: 10, fontWeight: "bold" }}>
+            <Text style={{ marginVertical: 10, fontFamily: FONTS.bold }}>
               Cài đặt
             </Text>
             <View
@@ -316,7 +318,7 @@ const styles = StyleSheet.create({
   btnText: {
     color: "white",
     fontSize: 15,
-    fontWeight: "bold",
+    fontFamily: FONTS.semiBold,
   },
   btnContainer: {
     backgroundColor: "red",
