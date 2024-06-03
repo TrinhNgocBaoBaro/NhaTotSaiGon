@@ -23,6 +23,7 @@ import PostDetailScreen from "./screens/PostDetailScreen";
 
 import COLORS from "./constants/color";
 import FONTS from "./constants/font";
+import CreateAppointmentScreen from "./screens/CreateAppointmentScreen";
 
 const CustomTabBarButton = ({ onPress }) => (
   <View
@@ -219,6 +220,7 @@ export default function App() {
           <Stack.Screen name="Appointment" component={AppointmentScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+          <Stack.Screen name="CreateAppointment" component={CreateAppointmentScreen} />
 
         </Stack.Navigator>
       </NavigationContainer>

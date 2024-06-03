@@ -1,12 +1,12 @@
 import {
-  SafeAreaView,
   StyleSheet,
   View,
   Image,
   Text,
-  Pressable,
   StatusBar,
   TouchableOpacity,
+  Button,
+  TextInput
 } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -14,10 +14,13 @@ import COLORS from "../constants/color";
 import Swiper from "react-native-swiper";
 import FONTS from "../constants/font";
 import { ScrollView } from "react-native-gesture-handler";
+import { ButtonFlex, ButtonFloatBottom } from "../components/Button";
+import Modal from "react-native-modal";
 
 const PostDetailScreen = ({ navigation }) => {
 
   const [showMoreDescription, setShowMoreDescription] = React.useState(false);
+  const [showModalComment, setShowModalComment] = React.useState(false);
 
   return (
     <>
@@ -97,8 +100,8 @@ const PostDetailScreen = ({ navigation }) => {
           >
             <View
               style={{
-                height: 40,
-                width: 40,
+                height: 50,
+                width: 50,
                 marginLeft: 20,
                 justifyContent: "center",
                 alignItems: "center",
@@ -106,14 +109,14 @@ const PostDetailScreen = ({ navigation }) => {
                 borderRadius: 50,
               }}
             >
-              <Icon name="arrow-back-outline" size={25} color={COLORS.orange} />
+              <Icon name="arrow-back-outline" size={28} color={COLORS.orange} />
             </View>
           </TouchableOpacity>
           <TouchableOpacity activeOpacity={0.5} onPress={() => {}}>
             <View
               style={{
-                height: 40,
-                width: 40,
+                height: 50,
+                width: 50,
                 marginRight: 20,
                 justifyContent: "center",
                 alignItems: "center",
@@ -121,7 +124,7 @@ const PostDetailScreen = ({ navigation }) => {
                 borderRadius: 50,
               }}
             >
-              <Icon name={"heart-outline"} size={23} color={COLORS.orange} />
+              <Icon name={"heart-outline"} size={25} color={COLORS.orange} />
             </View>
           </TouchableOpacity>
         </View>
@@ -133,7 +136,7 @@ const PostDetailScreen = ({ navigation }) => {
             backgroundColor: "white",
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
-            height: 1300,
+            marginBottom: 120,
           }}
         >
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }}>
@@ -162,6 +165,18 @@ const PostDetailScreen = ({ navigation }) => {
               }}
             >
               0123456789
+            </Text>
+          </View>
+          <View style={{ flexDirection: "row", marginTop: 10 }}>
+            <Icon name="layers" size={20} color={COLORS.orange} />
+            <Text
+              style={{
+                fontFamily: FONTS.medium,
+                marginLeft: 10,
+                flexShrink: 1,
+              }}
+            >
+              Tiện ích: Wifi miễn phí, điện nước, gần chợ, trường học.
             </Text>
           </View>
           <View style={{ flexDirection: "row", marginTop: 10 }}>
@@ -209,8 +224,8 @@ const PostDetailScreen = ({ navigation }) => {
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }}>
                 Nguyễn Lê Hữu
               </Text>
-              <Text style={{ fontFamily: FONTS.medium, fontSize: 11 }}>
-                lehuu123@gmail.com
+              <Text style={{ fontFamily: FONTS.medium, fontSize: 12, marginTop: 5, color: COLORS.grey}}>
+                Người đăng tin
               </Text>
             </View>
           </View>
@@ -322,6 +337,39 @@ const PostDetailScreen = ({ navigation }) => {
           </View>
         </View>
       </ScrollView>
+      <TouchableOpacity
+        onPress={()=>setShowModalComment(!showModalComment)}
+        activeOpacity={0.9}
+        style={{position: 'absolute', bottom: 100, right: 20, backgroundColor: COLORS.orange, 
+                borderRadius: 50, padding: 20, alignSelf: 'flex-end', elevation: 5}}>
+        <Icon name="chatbox-ellipses" color={COLORS.white} size={30}/>
+      </TouchableOpacity>
+      <ButtonFloatBottom title="Đặt lịch hẹn" buttonColor={COLORS.orange} onPress={()=>navigation.navigate("CreateAppointment")}/>
+      <Modal isVisible={showModalComment} 
+             onBackdropPress={()=> setShowModalComment(!showModalComment)}
+             animationOutTiming={800}
+      >
+        <View style={{width: 'auto', height: 'auto', backgroundColor: COLORS.white, borderRadius: 10, padding: 20}}>
+          <Text style={{fontFamily: FONTS.semiBold, fontSize: 18}}>Bình luận</Text>
+          <TextInput
+            style={{    
+              height: 56,
+              paddingLeft: 25,
+              fontSize: 16,
+              fontFamily: FONTS.medium,
+              backgroundColor: COLORS.greyPastel,
+              borderRadius: 10,
+              marginVertical: 20
+              }}
+            placeholder="Aa..."
+            maxLength={60}
+          />
+          <ButtonFlex title={"Gửi"} onPress={()=>setShowModalComment(!showModalComment)} 
+                      stylesText={{fontSize: 16, fontFamily: FONTS.semiBold}}
+                      stylesButton={{paddingVertical: 15}}
+          />
+        </View>
+      </Modal>
     </>
   );
 };

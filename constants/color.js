@@ -10,7 +10,7 @@ const COLORS = {
     blue: '#00B2FF',
     pink: '#FF69B4',
     // orange: '#F9961F'
-    orange: '#EC7A34'
+    orange: '#EC7A34' //#E57770 #EC7A34
 
 
 }
