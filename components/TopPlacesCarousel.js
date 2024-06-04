@@ -39,7 +39,7 @@ const listCarousel = [
     {
         id: "1",
         name: "Bơ Bán Bò",
-        address: "203 Đ.Lê Văn Việt, Hiệp Phú",
+        address: "203 Đ.Lê Văn Việt, Hiệp Phú, Quận 9",
         time: "10:00 AM - 11:00 PM",
         image: "https://file4.batdongsan.com.vn/2022/08/26/PHJN6Zw0/20220826100833-50e4.jpg",
         latitude: 10.8441, 
@@ -117,7 +117,7 @@ const TopPlacesCarousel = () => {
                                 <Image style={styles.image} source={{uri: item.image}} />
                             </View>
                             <View style={styles.titleBox}>
-                                <Text style={styles.title}>{item.name}</Text>
+                                <Text style={styles.title} numberOfLines={1}>{item.address}</Text>
                                 <Text style={styles.subTitle}>Xem chi tiết</Text>
                             </View>
                         </View>
@@ -146,13 +146,14 @@ const styles = StyleSheet.create({
     titleBox: {
         position: 'absolute',
         left: 18,
-        top: 80
+        top: 80,
+        width: '75%'
     },
     title: {
         color: 'white',
         fontWeight: 'bold',
         fontSize: 15,
-        textShadowColor: 'rgba(0, 0, 0, 0.5)', textShadowOffset: { width: 2, height: 2 }, textShadowRadius: 5
+        textShadowColor: 'rgba(0, 0, 0, 0.5)', textShadowOffset: { width: 2, height: 2 }, textShadowRadius: 5,
     },
     subTitle: {
         color: 'white',

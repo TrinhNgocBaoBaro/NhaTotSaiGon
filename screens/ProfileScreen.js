@@ -127,7 +127,7 @@ const ProfileScreen = ({ navigation }) => {
                 justifyContent: "center",
               }}
             >
-              <Icon name="skull-outline" size={28} color={"black"} />
+              <Icon name="person-outline" size={28} color={"black"} />
             </View>
           </Pressable>
           <View style={{ justifyContent: "center" }}>

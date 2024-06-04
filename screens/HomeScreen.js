@@ -118,7 +118,7 @@ const HomeScreen = ({ navigation }) => {
             }}
           >
             <Text style={{ fontFamily: FONTS.bold, fontSize: 18 }}>
-              Tin mới nhất
+              Gợi ý cho bạn
             </Text>
             <TouchableOpacity>
               <Text
@@ -143,11 +143,199 @@ const HomeScreen = ({ navigation }) => {
               justifyContent: "space-between",
             }}
           >
-          <Text style={{ fontFamily: FONTS.bold, fontSize: 18 }}>Bài viết</Text>
+          <Text style={{ fontFamily: FONTS.bold, fontSize: 18 }}>Tin mới nhất</Text>
           <TouchableOpacity>
               <Icon name="options" color={COLORS.grey} size={23}/>
             </TouchableOpacity>
           </View>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={()=> navigation.navigate("PostDetail")}
+            style={{
+              marginTop: 20,
+              marginBottom: 0,
+              elevation: 1,
+              backgroundColor: COLORS.white,
+              borderRadius: 10,
+              overflow: "hidden",
+            }}
+          >
+            <View style={{}}>
+              <Image
+                source={{
+                  uri: "https://pt123.cdn.static123.com/images/thumbs/900x600/fit/2021/02/22/cho-thue-phong-tro_1613975723.jpg",
+                }}
+                style={{ height: 200, width: "auto" }}
+              />
+              <View
+                  style={{ position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
+              >
+                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>1.500.000 đ</Text>
+              </View>
+            </View>
+            <View style={{ padding: 10 }}>
+              <View style={{ flexDirection: "row", marginBottom: 5 }}>
+              <Icon name="location-sharp" size={20} color={COLORS.orange} />
+                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, flexShrink: 1  }}>
+                  Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh
+                </Text>
+              </View>
+
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Icon name="file-tray" size={20} color={COLORS.orange} />
+                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
+                  Diện tích: 50 m2
+                </Text>
+              </View>
+              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>10 phút trước</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={()=> navigation.navigate("PostDetail")}
+            style={{
+              marginTop: 20,
+              marginBottom: 0,
+              elevation: 1,
+              backgroundColor: COLORS.white,
+              borderRadius: 10,
+              overflow: "hidden",
+            }}
+          >
+            <View style={{}}>
+              <Image
+                source={{
+                  uri: "https://baohanam-fileserver.nvcms.net/IMAGES/2023/09/13/20230913181412-97tro.jpg",
+                }}
+                style={{ height: 200, width: "auto" }}
+              />
+              <View
+                  style={{ position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
+              >
+                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>3.000.000 đ</Text>
+              </View>
+            </View>
+            <View style={{ padding: 10 }}>
+              <View style={{ flexDirection: "row", marginBottom: 5 }}>
+              <Icon name="location-sharp" size={20} color={COLORS.orange} />
+                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, flexShrink: 1  }}>
+                  Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh
+                </Text>
+              </View>
+
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Icon name="file-tray" size={20} color={COLORS.orange} />
+                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
+                  Diện tích: 70 m2
+                </Text>
+              </View>
+              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>1 giờ trước</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={()=> navigation.navigate("PostDetail")}
+            style={{
+              marginTop: 20,
+              marginBottom: 0,
+              elevation: 1,
+              backgroundColor: COLORS.white,
+              borderRadius: 10,
+              overflow: "hidden",
+            }}
+          >
+            <View style={{}}>
+              <Image
+                source={{
+                  uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQU_EcqcGnIaUjkMyVVFrgxVEV8HVilApXvx0QFJZRc7wr3DbYLjpwseMEGLTjONbYe7Nk&usqp=CAU",
+                }}
+                style={{ height: 200, width: "auto" }}
+              />
+              <View
+                  style={{ position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
+              >
+                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>750.000 đ</Text>
+              </View>
+            </View>
+            <View style={{ padding: 10 }}>
+              <View style={{ flexDirection: "row", marginBottom: 5 }}>
+              <Icon name="location-sharp" size={20} color={COLORS.orange} />
+                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, flexShrink: 1  }}>
+                  Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh
+                </Text>
+              </View>
+
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Icon name="file-tray" size={20} color={COLORS.orange} />
+                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
+                  Diện tích: 26 m2
+                </Text>
+              </View>
+              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>3 ngày trước</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={()=> navigation.navigate("PostDetail")}
+            style={{
+              marginTop: 20,
+              marginBottom: 0,
+              elevation: 1,
+              backgroundColor: COLORS.white,
+              borderRadius: 10,
+              overflow: "hidden",
+            }}
+          >
+            <View style={{}}>
+              <Image
+                source={{
+                  uri: "https://vatlieuso.com/wp-content/uploads/2021/10/chi-phi-xay-nha-tro.jpg",
+                }}
+                style={{ height: 200, width: "auto" }}
+              />
+              <View
+                  style={{ position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
+              >
+                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>1.500.000 đ</Text>
+              </View>
+            </View>
+            <View style={{ padding: 10 }}>
+              <View style={{ flexDirection: "row", marginBottom: 5 }}>
+              <Icon name="location-sharp" size={20} color={COLORS.orange} />
+                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, flexShrink: 1  }}>
+                  Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh
+                </Text>
+              </View>
+
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Icon name="file-tray" size={20} color={COLORS.orange} />
+                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
+                  Diện tích: 50 m2
+                </Text>
+              </View>
+              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>10 phút trước</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+
+
+
+
+
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={()=> navigation.navigate("PostDetail")}
@@ -192,7 +380,14 @@ const HomeScreen = ({ navigation }) => {
               </View>
             </View>
           </TouchableOpacity>
+
+
+
+
+
           <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={()=> navigation.navigate("PostDetail")}
             style={{
               marginTop: 20,
               marginBottom: 0,
@@ -209,15 +404,85 @@ const HomeScreen = ({ navigation }) => {
                 }}
                 style={{ height: 200, width: "auto" }}
               />
+              <View
+                  style={{ position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
+              >
+                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>1.500.000 đ</Text>
+              </View>
             </View>
             <View style={{ padding: 10 }}>
-              <Text>
-                Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9 Số 338 Đỗ Xuân Hợp,
-                Phước Long A, Quận 9
-              </Text>
-              <Text>Diện tích: 50 m2</Text>
+              <View style={{ flexDirection: "row", marginBottom: 5 }}>
+              <Icon name="location-sharp" size={20} color={COLORS.orange} />
+                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, flexShrink: 1  }}>
+                  Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh
+                </Text>
+              </View>
+
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Icon name="file-tray" size={20} color={COLORS.orange} />
+                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
+                  Diện tích: 50 m2
+                </Text>
+              </View>
+              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>10 phút trước</Text>
+              </View>
             </View>
           </TouchableOpacity>
+
+
+
+
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={()=> navigation.navigate("PostDetail")}
+            style={{
+              marginTop: 20,
+              marginBottom: 0,
+              elevation: 1,
+              backgroundColor: COLORS.white,
+              borderRadius: 10,
+              overflow: "hidden",
+            }}
+          >
+            <View style={{}}>
+              <Image
+                source={{
+                  uri: "https://baohanam-fileserver.nvcms.net/IMAGES/2023/09/13/20230913181412-97tro.jpg",
+                }}
+                style={{ height: 200, width: "auto" }}
+              />
+              <View
+                  style={{ position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
+              >
+                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>1.500.000 đ</Text>
+              </View>
+            </View>
+            <View style={{ padding: 10 }}>
+              <View style={{ flexDirection: "row", marginBottom: 5 }}>
+              <Icon name="location-sharp" size={20} color={COLORS.orange} />
+                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, flexShrink: 1  }}>
+                  Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh
+                </Text>
+              </View>
+
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Icon name="file-tray" size={20} color={COLORS.orange} />
+                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
+                  Diện tích: 50 m2
+                </Text>
+              </View>
+              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>10 phút trước</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+
+
+
+
         </View>
       </ScrollView>
     </>

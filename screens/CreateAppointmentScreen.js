@@ -4,6 +4,7 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  Alert
 } from "react-native";
 import React from "react";
 import Header from "../components/Header";
@@ -12,96 +13,99 @@ import COLORS from "../constants/color";
 import FONTS from "../constants/font";
 import Icon from "react-native-vector-icons/Ionicons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { ButtonFloatBottom } from "../components/Button";
 
 const time = [
   {
     id: "1",
-    time: "10:00",
+    time: "8:00",
   },
   {
     id: "2",
-    time: "10:30",
+    time: "8:30",
   },
   {
     id: "3",
-    time: "11:00",
+    time: "9:00",
   },
   {
     id: "4",
-    time: "11:30",
+    time: "9:30",
   },
   {
     id: "5",
-    time: "12:00",
+    time: "10:00",
   },
   {
     id: "6",
-    time: "12:30",
+    time: "10:30",
   },
   {
     id: "7",
-    time: "13:00",
+    time: "11:00",
   },
   {
     id: "8",
-    time: "13:30",
+    time: "11:30",
   },
   {
     id: "9",
-    time: "14:00",
+    time: "12:00",
   },
   {
     id: "10",
-    time: "14:30",
+    time: "12:30",
   },
   {
     id: "11",
-    time: "15:00",
+    time: "13:00",
   },
   {
     id: "12",
-    time: "15:30",
+    time: "13:30",
   },
   {
     id: "13",
-    time: "16:00",
+    time: "14:00",
   },
   {
     id: "14",
-    time: "16:30",
+    time: "14:30",
   },
   {
     id: "15",
-    time: "17:00",
+    time: "15:00",
   },
   {
     id: "16",
-    time: "17:30",
+    time: "15:30",
   },
   {
     id: "17",
-    time: "18:00",
+    time: "16:00",
   },
   {
     id: "18",
-    time: "18:30",
+    time: "16:30",
   },
   {
     id: "19",
-    time: "19:00",
+    time: "17:00",
   },
   {
     id: "20",
-    time: "19:30",
+    time: "17:30",
   },
   {
     id: "21",
-    time: "20:00",
+    time: "18:00",
   },
 ];
 
 const CreateAppointmentScreen = ({ navigation }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = React.useState(false);
+  const [datePicked, setDatePicked] = React.useState(null);
+  const [timePicked, setTimePicked] = React.useState();
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -112,9 +116,27 @@ const CreateAppointmentScreen = ({ navigation }) => {
   };
 
   const handleConfirm = (date) => {
-    console.warn("A date has been picked: ", date);
+    console.log("A date has been picked: ", date);
+    setDatePicked(date);
     hideDatePicker();
   };
+
+  const showButtonConfirm = () =>
+    Alert.alert('Xác nhận', 'Bạn có muốn hoàn tất đặt lịch hẹn?', [
+      {
+        text: 'Hủy',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {text: 'OK', onPress: () => navigation.navigate("DoneAppointment")},
+    ]);
+
+  function formatDatePicked(datePicked) {
+    const day = datePicked.getDate();
+    const month = datePicked.getMonth() + 1; 
+    const year = datePicked.getFullYear();
+    return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+}
   return (
     <>
       <Header
@@ -161,6 +183,10 @@ const CreateAppointmentScreen = ({ navigation }) => {
                 flex: 1,
               }}
               placeholder="Nhập số điện thoại"
+              inputMode="numeric"
+              keyboardType="numeric"
+            //   onChangeText={(newTextPhone) => setPhone(newTextPhone)}
+
             />
           </View>
         </View>
@@ -168,9 +194,12 @@ const CreateAppointmentScreen = ({ navigation }) => {
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15 }}>
             Thời gian xem phòng <Text style={{ color: COLORS.red }}>*</Text>
           </Text>
-          <Text style={{ fontFamily: FONTS.semiBold, marginTop: 20 }}>
+          <View style={{ marginTop: 20, flexDirection: 'row'}}>
+          <Icon name="time-outline" size={18} color={COLORS.orange}/>
+          <Text style={{ fontFamily: FONTS.semiBold, marginLeft: 5}}>
             Chọn giờ
           </Text>
+          </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -178,6 +207,7 @@ const CreateAppointmentScreen = ({ navigation }) => {
           >
             {time.map((item, index) => (
               <TouchableOpacity
+                onPress={()=> setTimePicked(item.time)}
                 activeOpacity={0.7}
                 style={{
                   paddingHorizontal: 15,
@@ -186,6 +216,7 @@ const CreateAppointmentScreen = ({ navigation }) => {
                   borderColor: COLORS.orange,
                   borderRadius: 8,
                   marginRight: 8,
+                  backgroundColor: timePicked === item.time ? COLORS.orange : COLORS.white
                 }}
                 key={index}
               >
@@ -193,7 +224,7 @@ const CreateAppointmentScreen = ({ navigation }) => {
                   style={{
                     fontFamily: FONTS.semiBold,
                     fontSize: 15,
-                    color: COLORS.orange,
+                    color:  timePicked === item.time ? COLORS.white : COLORS.orange,
                   }}
                 >
                   {item.time}
@@ -201,9 +232,12 @@ const CreateAppointmentScreen = ({ navigation }) => {
               </TouchableOpacity>
             ))}
           </ScrollView>
-          <Text style={{ fontFamily: FONTS.semiBold, marginTop: 20 }}>
+          <View style={{ marginTop: 20, flexDirection: 'row'}}>
+          <Icon name="calendar-outline" size={18} color={COLORS.orange}/>
+          <Text style={{ fontFamily: FONTS.semiBold,  marginLeft: 5}}>
             Chọn ngày
           </Text>
+          </View>
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={showDatePicker}
@@ -214,18 +248,18 @@ const CreateAppointmentScreen = ({ navigation }) => {
               borderRadius: 8,
               marginTop: 10,
               alignItems: "center",
-              backgroundColor: COLORS.orange,
+              backgroundColor: datePicked ? COLORS.orange : COLORS.white,
               width: "50%",
             }}
           >
             <Text
               style={{
                 fontFamily: FONTS.semiBold,
-                color: COLORS.white,
+                color: datePicked ? COLORS.white : COLORS.orange,
                 fontSize: 16,
               }}
             >
-              06/03/2024
+              {datePicked ? formatDatePicked(datePicked) : "_ _ / _ _ / _ _ _ _"}
             </Text>
           </TouchableOpacity>
           <DateTimePickerModal
@@ -238,8 +272,33 @@ const CreateAppointmentScreen = ({ navigation }) => {
             onCancel={hideDatePicker}
 
           />
+          <View style={{marginTop: 25, marginBottom: 25 }}>
+          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15 }}>
+            Ghi chú
+          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Icon name="create-outline" size={20} color={COLORS.orange} />
+            <TextInput
+              style={{
+                borderBottomWidth: 2,
+                borderBottomColor: COLORS.greyPastel,
+                marginHorizontal: 10,
+                fontFamily: FONTS.medium,
+                height: 100,
+                flex: 1,
+              }}
+              placeholder="Nhập ghi chú"
+              multiline
+              maxLength={150}
+              numberOfLines={3}
+            //   onChangeText={(newTextPhone) => setPhone(newTextPhone)}
+
+            />
+          </View>
+        </View>
         </View>
       </ScrollView>
+      <ButtonFloatBottom title={"Xác nhận"} buttonColor={COLORS.orange} onPress={showButtonConfirm}/>
     </>
   );
 };

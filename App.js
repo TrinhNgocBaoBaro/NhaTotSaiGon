@@ -24,6 +24,7 @@ import PostDetailScreen from "./screens/PostDetailScreen";
 import COLORS from "./constants/color";
 import FONTS from "./constants/font";
 import CreateAppointmentScreen from "./screens/CreateAppointmentScreen";
+import DoneAppointmentScreen from "./screens/DoneAppointmentScreen";
 
 const CustomTabBarButton = ({ onPress }) => (
   <View
@@ -181,10 +182,10 @@ const TabRoute = () => {
                   elevation: 4
                 }}
               >
-                <Icon name="skull" color="#fff" size={size} />
+                <Icon name="person" color="#fff" size={size} />
               </View>
             ) : (
-              <Icon name="skull-outline" color={color} size={28} />
+              <Icon name="person-outline" color={color} size={28} />
             );
           },
           headerShown: false,
@@ -212,8 +213,7 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator
           screenOptions={{ headerShown: false }}
-          initialRouteName="Home"
-        >
+          initialRouteName="Home">
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Home" component={TabRoute} />
           <Stack.Screen name="Search" component={SearchScreen} />
@@ -221,6 +221,7 @@ export default function App() {
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="PostDetail" component={PostDetailScreen} />
           <Stack.Screen name="CreateAppointment" component={CreateAppointmentScreen} />
+          <Stack.Screen name="DoneAppointment" component={DoneAppointmentScreen} />
 
         </Stack.Navigator>
       </NavigationContainer>

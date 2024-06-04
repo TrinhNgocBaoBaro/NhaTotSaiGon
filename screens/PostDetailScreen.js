@@ -44,7 +44,25 @@ const PostDetailScreen = ({ navigation }) => {
             <View style={styles.slide}>
               <Image
                 source={{
-                  uri: "https://www.transparentpng.com/thumb/user/gray-user-profile-icon-png-fP8Q1P.png",
+                  uri: "https://pt123.cdn.static123.com/images/thumbs/900x600/fit/2021/02/22/cho-thue-phong-tro_1613975723.jpg",
+                }}
+                style={styles.img}
+                resizeMode="cover"
+              />
+            </View>
+            <View style={styles.slide}>
+              <Image
+                source={{
+                  uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQU_EcqcGnIaUjkMyVVFrgxVEV8HVilApXvx0QFJZRc7wr3DbYLjpwseMEGLTjONbYe7Nk&usqp=CAU",
+                }}
+                style={styles.img}
+                resizeMode="cover"
+              />
+            </View>
+            <View style={styles.slide}>
+              <Image
+                source={{
+                  uri: "https://cafefcdn.com/203337114487263232/2022/8/5/83-1659675881831241642789.jpeg",
                 }}
                 style={styles.img}
                 resizeMode="cover"
@@ -54,24 +72,6 @@ const PostDetailScreen = ({ navigation }) => {
               <Image
                 source={{
                   uri: "https://vatlieuso.com/wp-content/uploads/2021/10/chi-phi-xay-nha-tro.jpg",
-                }}
-                style={styles.img}
-                resizeMode="cover"
-              />
-            </View>
-            <View style={styles.slide}>
-              <Image
-                source={{
-                  uri: "https://cafefcdn.com/203337114487263232/2022/8/5/83-1659675881831241642789.jpeg",
-                }}
-                style={styles.img}
-                resizeMode="cover"
-              />
-            </View>
-            <View style={styles.slide}>
-              <Image
-                source={{
-                  uri: "https://cafefcdn.com/203337114487263232/2022/8/5/83-1659675881831241642789.jpeg",
                 }}
                 style={styles.img}
                 resizeMode="cover"
@@ -237,7 +237,7 @@ const PostDetailScreen = ({ navigation }) => {
             <View style={{ marginTop: 20, flexDirection: "row" }}>
               <Image
                 source={{
-                  uri: "https://i.sstatic.net/l60Hf.png",
+                  uri: "https://scontent.fsgn15-1.fna.fbcdn.net/v/t39.30808-6/431764296_1830389587405425_4880708078341224054_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=5f2048&_nc_ohc=QjPmZD9JHD0Q7kNvgEL-Wsi&_nc_ht=scontent.fsgn15-1.fna&oh=00_AYD3t1W87C8rLL-lx1PRLla7sdAE0jL3ICn8nABInCFT5w&oe=66637A1D",
                 }}
                 style={{ height: 35, width: 35, borderRadius: 50 }}
               />
@@ -269,15 +269,23 @@ const PostDetailScreen = ({ navigation }) => {
             <View style={{ marginTop: 20, flexDirection: "row" }}>
               <Image
                 source={{
-                  uri: "https://static.vecteezy.com/system/resources/previews/019/879/186/non_2x/user-icon-on-transparent-background-free-png.png",
+                  uri: "https://i.sstatic.net/l60Hf.png",
                 }}
                 style={{ height: 35, width: 35, borderRadius: 50 }}
               />
+               <View style={{ marginLeft: 15, height: "auto", width: "80%" }}>
+
+              <Text
+                  style={{
+                    fontFamily: FONTS.semiBold,
+                    marginBottom: 5,
+                    color: COLORS.orange,
+                  }}
+                >
+                  Ẩn danh
+                </Text>
               <View
                 style={{
-                  marginLeft: 15,
-                  height: "auto",
-                  width: "80%",
                   backgroundColor: COLORS.darkGrey,
                   padding: 10,
                   borderRadius: 10,
@@ -286,6 +294,7 @@ const PostDetailScreen = ({ navigation }) => {
                 <Text style={{ fontFamily: FONTS.medium }}>
                   Người thuê thôi chứ người cho thuê t nghĩ là bỏ caia nút đó đi
                 </Text>
+              </View>
               </View>
             </View>
 
@@ -315,7 +324,7 @@ const PostDetailScreen = ({ navigation }) => {
             <View style={{ marginTop: 20, flexDirection: "row" }}>
               <Image
                 source={{
-                  uri: "https://static.vecteezy.com/system/resources/previews/019/879/186/non_2x/user-icon-on-transparent-background-free-png.png",
+                  uri: "https://i.sstatic.net/l60Hf.png",
                 }}
                 style={{ height: 35, width: 35, borderRadius: 50 }}
               />
