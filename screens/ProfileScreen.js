@@ -13,6 +13,9 @@ import React from "react";
 import Icon from "react-native-vector-icons/Ionicons";
 import Icon1 from "react-native-vector-icons/FontAwesome";
 
+import auth from "@react-native-firebase/auth";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FONTS from "../constants/font";
 // import createAxios from "../utils/axios";
@@ -74,7 +77,12 @@ const ProfileScreen = ({ navigation }) => {
   ];
 
   const handleLogOut = () => {
-    navigation.popToTop();
+    auth()
+    .signOut()
+    .then(() => console.log("User signed out!"));
+    GoogleSignin.signOut();
+    navigation.navigate("Login")
+
   };
 
   const renderSettingsItem = ({ icon, text, sub }) => (
