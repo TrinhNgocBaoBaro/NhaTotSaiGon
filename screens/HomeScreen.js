@@ -77,7 +77,7 @@ const HomeScreen = ({ navigation }) => {
                 justifyContent: "center",
               }}
             >
-              <Icon name={"heart-outline"} size={33} color={"grey"} />
+              <Icon name={"heart-outline"} size={40} color={"orange"} />
             </View>
           </TouchableOpacity>
           <View style={{ marginRight: 20, justifyContent: "center" }}>
@@ -104,7 +104,7 @@ const HomeScreen = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Tìm kiếm nhà trọ, phòng trọ..."
-            onFocus={() => {}}
+            // onFocus={() => {navigation.navigate("Tìm kiếm")}}
           />
           <Icon name="search" size={23} color={COLORS.grey} />
         </View>

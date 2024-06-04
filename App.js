@@ -8,6 +8,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useFonts } from "expo-font";
+import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -25,53 +26,60 @@ import COLORS from "./constants/color";
 import FONTS from "./constants/font";
 import CreateAppointmentScreen from "./screens/CreateAppointmentScreen";
 import DoneAppointmentScreen from "./screens/DoneAppointmentScreen";
+import CreatePostScreen from "./screens/CreatePostScreen";
 
-const CustomTabBarButton = ({ onPress }) => (
-  <View
-    style={{
-      width: 90,
-      height: 90,
-      borderRadius: 45,
-      backgroundColor: "#fff",
-      justifyContent: "center",
-      alignItems: "center",
-      top: -50,
-      elevation: 1,
-    }}
-  >
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={onPress}
-      style={{
-        width: 70,
-        height: 70,
-        borderRadius: 35,
-        backgroundColor: "orange",
-        justifyContent: "center",
-        alignItems: "center",
+const toastConfig = {
+  success: (props) => (
+    <BaseToast
+      {...props}
+      style={{ borderLeftColor: COLORS.green, marginTop: 30, height: 70 }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{
+        fontSize: 15,
+        fontFamily: FONTS.semiBold
+        }}
+      text2Style={{
+        fontSize: 14,
+        fontFamily: FONTS.medium
       }}
-    >
-      <Icon name="add-outline" color={"white"} size={40} />
-    </TouchableOpacity>
-  </View>
-);
+    />
+  ),
+  error: (props) => (
+    <ErrorToast
+      {...props}
+      text1Style={{
+        fontSize: 17
+      }}
+      text2Style={{
+        fontSize: 15
+      }}
+    />
+  ),
+  tomatoToast: ({ text1, props }) => (
+    <View style={{ height: 60, width: '100%', backgroundColor: 'tomato' }}>
+      <Text>{text1}</Text>
+      <Text>{props.uuid}</Text>
+    </View>
+  )
+};
+
 
 const TabRoute = () => {
   return (
     <Tab.Navigator
-      screenOptions={{
-        tabBarActiveTintColor: COLORS.orange,
-        tabBarInactiveTintColor: COLORS.grey,
-        tabBarLabelStyle: {
-          fontFamily: FONTS.bold,
-          fontSize: 12,
-          marginBottom: 5,
-        },
-        tabBarStyle: {
-          backgroundColor: COLORS.white,
-          height: 60,
-        },
-      }}
+    screenOptions={({ route }) => ({
+      tabBarActiveTintColor: COLORS.orange,
+      tabBarInactiveTintColor: COLORS.grey,
+      tabBarLabelStyle: {
+        fontFamily: FONTS.bold,
+        fontSize: 12,
+        marginBottom: 5,
+      },
+      tabBarStyle: (route.name === 'Đăng tin' ? { display: 'none' } : {
+        backgroundColor: COLORS.white,
+        height: 60,
+      }),
+    })}
     >
       <Tab.Screen
         name="Trang chủ"
@@ -129,6 +137,37 @@ const TabRoute = () => {
             );
           },
           headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="Đăng tin"
+        component={CreatePostScreen}
+        options={{
+          tabBarIcon: ({ focused, color, size }) => {
+            return focused ? (
+              <View
+                style={{
+                  backgroundColor: COLORS.orange,
+                  borderRadius: 50,
+                  padding: 20,
+                  marginTop: -40,
+                  shadowColor: COLORS.orange,
+                  shadowOffset: {
+                    width: 0,
+                    height: 5,
+                  },
+                  shadowOpacity: 0.25,
+                  elevation: 4
+                }}
+              >
+                <Icon name="duplicate" color="#fff" size={size} />
+              </View>
+            ) : (
+              <Icon name="duplicate-outline" color={color} size={28} />
+            );
+          },
+          headerShown: false,
+          
         }}
       />
       <Tab.Screen
@@ -222,9 +261,10 @@ export default function App() {
           <Stack.Screen name="PostDetail" component={PostDetailScreen} />
           <Stack.Screen name="CreateAppointment" component={CreateAppointmentScreen} />
           <Stack.Screen name="DoneAppointment" component={DoneAppointmentScreen} />
-
+          <Stack.Screen name="CreatePost" component={CreatePostScreen} />
         </Stack.Navigator>
       </NavigationContainer>
+      <Toast config={toastConfig} />
     </GestureHandlerRootView>
   );
 }

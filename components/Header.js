@@ -7,13 +7,13 @@ import FONTS from '../constants/font';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height
 
-export default function Header({ title, rightIcon, onPress, onPressRight }) {
+export default function Header({ title, rightIcon, leftIcon ,onPress, onPressRight }) {
     return (
         <SafeAreaView>
             <View style={styles.top}>
                 <Pressable onPress={onPress}>
                     <View style={{ height: 40, width: 40, marginLeft: 20, justifyContent: 'center' }}>
-                        <Icon name="chevron-back-outline" size={30} color={COLORS.white} />
+                        <Icon name={leftIcon ? leftIcon : "arrow-back-outline"} size={30} color={COLORS.white} />
                     </View>
                 </Pressable>
                 <View style={{ justifyContent: 'center' }}>                   
