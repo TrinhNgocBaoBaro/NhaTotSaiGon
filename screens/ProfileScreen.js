@@ -8,6 +8,7 @@ import {
   StatusBar,
   ScrollView,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -25,22 +26,22 @@ const ProfileScreen = ({ navigation }) => {
   const [aboutMe, setAboutMe] = React.useState();
   const [showStationInfo, setShowStationInfo] = React.useState(false);
 
-  const getDataAboutMe = async ()  => {
+  const getDataAboutMe = async () => {
     try {
-      const response = await API.get(`/account/66518d7a458eef05bbb41c3c`)
-      if(response) {
-        console.log("Success get aboutMe")
-        setAboutMe(response)
-        console.log(response.data)
+      const response = await API.get(`/account/66518d7a458eef05bbb41c3c`);
+      if (response) {
+        console.log("Success get aboutMe");
+        setAboutMe(response);
+        console.log(response.data);
       }
     } catch (error) {
-        console.log(error)
+      console.log(error);
     }
-  }
+  };
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     getDataAboutMe();
-  },[])
+  }, []);
 
   const cacheAndCellularItems = [
     {
@@ -78,36 +79,38 @@ const ProfileScreen = ({ navigation }) => {
   ];
 
   const handleLogOut = () => {
-    auth()
-    .signOut()
-    .then(() => console.log("User signed out!"));
-    GoogleSignin.signOut();
-    navigation.navigate("Login")
-
+    Alert.alert(
+      "Xác nhận",
+      "Bạn có chắc chắn muốn đăng xuất?",
+      [
+        {
+          text: "Hủy",
+          style: "cancel",
+        },
+        {
+          text: "Đăng xuất",
+          onPress: async () => {
+            try {
+              await auth().signOut();
+              await GoogleSignin.signOut();
+              console.log("User signed out!");
+            } catch (error) {
+              console.error("Error signing out: ", error);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   const renderSettingsItem = ({ icon, text, sub }) => (
     <TouchableOpacity
       activeOpacity={1}
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        backgroundColor: "white",
-        justifyContent: "space-between",
-      }}
+      style={styles.settingsItem}
     >
       <Icon name={icon} size={24} color="grey" />
-      <Text
-        style={{
-          marginLeft: 15,
-          fontSize: 15,
-          minWidth: 250,
-          fontWeight: 500,
-          fontFamily: FONTS.semiBold
-        }}
-      >
+      <Text style={styles.settingsText}>
         {text}
       </Text>
       <View style={{ alignSelf: "flex-end" }}>
@@ -116,39 +119,28 @@ const ProfileScreen = ({ navigation }) => {
           size={24}
           color="grey"
           style={{
-            fontWeight: 600,
+            fontWeight: "600",
             fontSize: 24,
           }}
         />
       </View>
     </TouchableOpacity>
   );
+
   return (
     <>
       <SafeAreaView>
         <View style={styles.top}>
           <Pressable onPress={() => navigation.goBack()}>
-            <View
-              style={{
-                height: 40,
-                width: 40,
-                marginLeft: 20,
-                justifyContent: "center",
-              }}
-            >
+            <View style={styles.topButton}>
               <Icon name="person-outline" size={28} color={"black"} />
             </View>
           </Pressable>
           <View style={{ justifyContent: "center" }}>
-            <Text style={{ fontSize: 22, fontFamily: FONTS.bold }}>Tài khoản</Text>
+            <Text style={styles.title}>Tài khoản</Text>
           </View>
           <Pressable
-            style={{
-              marginRight: 20,
-              height: 40,
-              width: 40,
-              justifyContent: "center",
-            }}
+            style={styles.topButton}
             onPress={() => {}}
           >
             <Icon name="ellipsis-vertical" size={25} color={"black"} />
@@ -165,20 +157,13 @@ const ProfileScreen = ({ navigation }) => {
             source={{
               uri: aboutMe ? aboutMe.image : "https://scontent.fsgn15-1.fna.fbcdn.net/v/t39.30808-1/438238559_1143642673426668_6656372791733229549_n.jpg?stp=c2.0.200.200a_dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=-2s72PAG7cEQ7kNvgEXAYaA&_nc_ht=scontent.fsgn15-1.fna&oh=00_AYAE6pxdrTkzfxHAGoHxzJfSAVLf9yEAF-BEkZqeKL7DBw&oe=6660C602",
             }}
-            style={{ height: 50, width: 50, borderRadius: 50 }}
+            style={styles.profileImage}
           />
-          <View
-            style={{
-              height: 100,
-              marginLeft: 25,
-              paddingVertical: 32,
-              flex: 1,
-            }}
-          >
-            <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }}>
+          <View style={styles.profileDetails}>
+            <Text style={styles.profileName}>
               Trịnh Ngọc Bảo
             </Text>
-            <Text style={{ fontSize: 13, color: "grey", fontFamily: FONTS.semiBold }}>
+            <Text style={styles.profileEmail}>
               ngbao1592001@gmail.com
             </Text>
           </View>
@@ -189,77 +174,40 @@ const ProfileScreen = ({ navigation }) => {
 
         <View style={{ marginHorizontal: 20 }}>
           <View style={{ marginBottom: 12 }}>
-            <Text style={{ marginVertical: 10, fontFamily: FONTS.bold }}>
-              Tài khoản
-            </Text>
-            <View
-              style={{
-                backgrounColor: "grey",
-                borderRadius: 5,
-                overflow: "hidden",
-                elevation: 2,
-              }}
-            >
+            <Text style={styles.sectionTitle}>Tài khoản</Text>
+            <View style={styles.sectionContainer}>
               <TouchableOpacity
                 activeOpacity={1}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  paddingVertical: 15,
-                  paddingHorizontal: 20,
-                  backgroundColor: "white",
-                  justifyContent: "space-between",
-                }}
+                style={styles.settingsItem}
               >
                 <Icon
                   name={"shield-checkmark-outline"}
                   size={24}
                   color="grey"
                 />
-                <Text
-                  style={{
-                    marginLeft: 15,
-                    fontSize: 15,
-                    minWidth: 250,
-                    fontFamily: FONTS.semiBold,
-                  }}
-                >
+                <Text style={styles.settingsText}>
                   {"Quyền riêng tư"}
                 </Text>
                 <View style={{ alignSelf: "flex-end" }}>
                   <TouchableOpacity>
-                  <Icon1
-                    name={"toggle-off"}
-                    size={24}
-                    color="grey"
-                    style={{
-                      fontWeight: 600,
-                      fontSize: 24,
-                    }}
-                  />
+                    <Icon1
+                      name={"toggle-off"}
+                      size={24}
+                      color="grey"
+                      style={{
+                        fontWeight: "600",
+                        fontSize: 24,
+                      }}
+                    />
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={1}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  paddingVertical: 15,
-                  paddingHorizontal: 20,
-                  backgroundColor: "white",
-                  justifyContent: "space-between",
-                }}
+                style={styles.settingsItem}
               >
                 <Icon name={"person-circle-outline"} size={24} color="grey" />
-                <Text
-                  style={{
-                    marginLeft: 15,
-                    fontSize: 15,
-                    minWidth: 250,
-                    fontFamily: FONTS.semiBold,
-                  }}
-                >
+                <Text style={styles.settingsText}>
                   {"Thông tin tài khoản"}
                 </Text>
                 <View style={{ alignSelf: "flex-end" }}>
@@ -268,7 +216,7 @@ const ProfileScreen = ({ navigation }) => {
                     size={24}
                     color="grey"
                     style={{
-                      fontWeight: 600,
+                      fontWeight: "600",
                       fontSize: 24,
                     }}
                   />
@@ -278,17 +226,8 @@ const ProfileScreen = ({ navigation }) => {
           </View>
 
           <View style={{ marginBottom: 12 }}>
-            <Text style={{ marginVertical: 10, fontFamily: FONTS.bold }}>
-              Cài đặt
-            </Text>
-            <View
-              style={{
-                borderRadius: 5,
-                backgrounColor: "grey",
-                overflow: "hidden",
-                elevation: 2,
-              }}
-            >
+            <Text style={styles.sectionTitle}>Cài đặt</Text>
+            <View style={styles.sectionContainer}>
               {accountItems.map((item, index) => (
                 <React.Fragment key={index}>
                   {renderSettingsItem(item)}
@@ -310,6 +249,7 @@ const ProfileScreen = ({ navigation }) => {
     </>
   );
 };
+
 const styles = StyleSheet.create({
   itemCard: {
     height: 80,
@@ -331,12 +271,12 @@ const styles = StyleSheet.create({
   },
   btnContainer: {
     backgroundColor: "red",
-    height: 35,
-    width: 130,
-    borderRadius: 5,
+    height: 45,
+    width: 150,
+    borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 20,
   },
   top: {
     marginTop: StatusBar.currentHeight,
@@ -345,6 +285,60 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: "white",
     height: 80,
+  },
+  topButton: {
+    height: 40,
+    width: 40,
+    marginLeft: 20,
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: 22,
+    fontFamily: FONTS.bold,
+  },
+  profileImage: {
+    height: 50,
+    width: 50,
+    borderRadius: 50,
+  },
+  profileDetails: {
+    height: 100,
+    marginLeft: 25,
+    paddingVertical: 32,
+    flex: 1,
+  },
+  profileName: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 16,
+  },
+  profileEmail: {
+    fontSize: 13,
+    color: "grey",
+    fontFamily: FONTS.semiBold,
+  },
+  sectionTitle: {
+    marginVertical: 10,
+    fontFamily: FONTS.bold,
+  },
+  sectionContainer: {
+    backgroundColor: "grey",
+    borderRadius: 5,
+    overflow: "hidden",
+    elevation: 2,
+  },
+  settingsItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: "white",
+    justifyContent: "space-between",
+  },
+  settingsText: {
+    marginLeft: 15,
+    fontSize: 15,
+    minWidth: 250,
+    fontFamily: FONTS.semiBold,
   },
 });
 

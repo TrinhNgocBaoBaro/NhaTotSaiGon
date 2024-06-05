@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import COLORS from "../constants/color";
 import FONTS from "../constants/font";
 import Icon from "react-native-vector-icons/Ionicons";
+import LoadingModal from "../components/LoadingModal";
 
 const favouriteList = [
   {
@@ -106,14 +107,12 @@ const FavouriteScreen = ({ navigation }) => {
                     flexDirection: "row",
                     borderBottomWidth:2,
                     borderBottomColor: COLORS.greyPastel
-                    // borderWidth: 1,
-                    // borderColor: "transparent",
                   }
                 }
               >
                 <Image
                   source={{ uri: item.image }}
-                  style={{ height: 80, width: 80, borderRadius: 5 }}
+                  style={{ height: 100, width: 100, borderRadius: 5 }}
                 />
                 <View
                   style={{
@@ -137,13 +136,15 @@ const FavouriteScreen = ({ navigation }) => {
                     Diện tích: {item.time} m2
                   </Text>
                 </View>
-                <Icon onPress={()=>{}} name="trash-outline" color={COLORS.orange} size={24} style={{alignSelf: 'center'}}/> 
+                <Icon onPress={()=>{console.log("haha")}} name="trash-outline" color={COLORS.orange} size={24} style={{alignSelf: 'center'}}/> 
               </TouchableOpacity>
             )
         }
         keyExtractor={(item) => item.id}
         style={{backgroundColor: COLORS.white}}
       />
+      {/* <LoadingModal modalVisible={true}/> */}
+
     </>
   );
 };

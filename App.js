@@ -12,6 +12,7 @@ import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+import AuthContext, { AuthProvider } from "./context/AuthContext";
 
 import "expo-dev-client";
 
@@ -28,6 +29,7 @@ import CreateAppointmentScreen from "./screens/CreateAppointmentScreen";
 import DoneAppointmentScreen from "./screens/DoneAppointmentScreen";
 import CreatePostScreen from "./screens/CreatePostScreen";
 import FavouriteScreen from "./screens/FavouriteScreen";
+import SplashScreen from "./screens/SplashScreen";
 
 const toastConfig = {
   success: (props) => (
@@ -249,26 +251,35 @@ export default function App() {
 
 
   return (
+    <AuthProvider>
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{ headerShown: false }}
-          initialRouteName="Login">
-          <Stack.Screen name="Login" component={LoginScreen} />
+      <AuthContext.Consumer>
+      {({ user, initializing }) => (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {initializing ? (
+          // You can add a splash screen here
+          <Stack.Screen name="Splash" component={SplashScreen} />
+        ) : user ? (
+          <>
           <Stack.Screen name="Home" component={TabRoute} />
-          <Stack.Screen name="Search" component={SearchScreen} />
-          <Stack.Screen name="Appointment" component={AppointmentScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="PostDetail" component={PostDetailScreen} />
           <Stack.Screen name="CreateAppointment" component={CreateAppointmentScreen} />
           <Stack.Screen name="DoneAppointment" component={DoneAppointmentScreen} />
           <Stack.Screen name="CreatePost" component={CreatePostScreen} />
           <Stack.Screen name="Favourite" component={FavouriteScreen} />
-
-        </Stack.Navigator>
+          </>
+        ) : (
+          <Stack.Screen name="Login" component={LoginScreen} />
+        )}
+      </Stack.Navigator>
+        )}
+        </AuthContext.Consumer>
       </NavigationContainer>
       <Toast config={toastConfig} />
     </GestureHandlerRootView>
+    </AuthProvider>
+
   );
 }
 

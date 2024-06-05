@@ -111,6 +111,25 @@ const CreatePostScreen = ({navigation}) => {
             />
           </View>
         </View>
+        <View style={{ marginBottom: 25 }}>
+          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15 }}>
+            Tiện ích <Text style={{ color: COLORS.red }}></Text>
+          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Icon name="layers" size={20} color={COLORS.orange} />
+            <TextInput
+              style={{
+                borderBottomWidth: 2,
+                borderBottomColor: COLORS.greyPastel,
+                height: 50,
+                marginHorizontal: 10,
+                fontFamily: FONTS.medium,
+                flex: 1,
+              }}
+              placeholder="VD: Wifi miễn phí, điện nước, gần trường học,..."
+            />
+          </View>
+        </View>
 
 
         <View style={{flexDirection: 'row'}}>

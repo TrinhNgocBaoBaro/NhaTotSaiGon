@@ -170,6 +170,18 @@ const PostDetailScreen = ({ navigation }) => {
             </Text>
           </View>
           <View style={{ flexDirection: "row", marginTop: 10 }}>
+            <Icon name="pricetags" size={20} color={COLORS.orange} />
+            <Text
+              style={{
+                fontFamily: FONTS.medium,
+                marginLeft: 10,
+                flexShrink: 1,
+              }}
+            >
+              11.500.000đ / 1 tháng
+            </Text>
+          </View>
+          <View style={{ flexDirection: "row", marginTop: 10 }}>
             <Icon name="call" size={20} color={COLORS.orange} />
             <Text
               style={{
