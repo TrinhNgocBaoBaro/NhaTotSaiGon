@@ -86,7 +86,21 @@ const PostDetailScreen = ({ navigation }) => {
                 resizeMode="cover"
               />
             </View>
+            <View style={styles.slide}>
+              <Image
+                source={{
+                  uri: "https://cafefcdn.com/203337114487263232/2022/8/5/83-1659675881831241642789.jpeg",
+                }}
+                style={styles.img}
+                resizeMode="cover"
+              />
+            </View>
           </Swiper>
+          <View
+                  style={{elevation: 2, position: 'absolute', right: 10, bottom: 50, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
+              >
+                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>11.500.000 đ</Text>
+              </View>
         </View>
         <View
           style={[
@@ -212,8 +226,8 @@ const PostDetailScreen = ({ navigation }) => {
             </Text>
             </TouchableOpacity>
           </View>
-
-          <View style={{ flexDirection: "row", marginTop: 30 }}>
+          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, marginTop: 10, alignSelf: 'flex-end' }}>15 giờ trước</Text>
+          <View style={{ flexDirection: "row", marginTop: 20 }}>
             <Image
               source={{
                 uri: "https://scontent.fsgn15-1.fna.fbcdn.net/v/t39.30808-1/438238559_1143642673426668_6656372791733229549_n.jpg?stp=c2.0.200.200a_dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=-2s72PAG7cEQ7kNvgEXAYaA&_nc_ht=scontent.fsgn15-1.fna&oh=00_AYAE6pxdrTkzfxHAGoHxzJfSAVLf9yEAF-BEkZqeKL7DBw&oe=6660C602",

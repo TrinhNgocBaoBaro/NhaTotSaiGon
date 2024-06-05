@@ -7,17 +7,17 @@ import FONTS from '../constants/font';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height
 
-export default function Header({ title, rightIcon, leftIcon ,onPress, onPressRight }) {
+export default function Header({ title, rightIcon, leftIcon ,onPress, onPressRight, colorText, colorBackground }) {
     return (
         <SafeAreaView>
-            <View style={styles.top}>
+            <View style={[styles.top,{backgroundColor: colorBackground || COLORS.orange}]}>
                 <Pressable onPress={onPress}>
                     <View style={{ height: 40, width: 40, marginLeft: 20, justifyContent: 'center' }}>
-                        <Icon name={leftIcon ? leftIcon : "arrow-back-outline"} size={30} color={COLORS.white} />
+                        <Icon name={leftIcon ? leftIcon : "arrow-back-outline"} size={30} color={colorText ||COLORS.white} />
                     </View>
                 </Pressable>
                 <View style={{ justifyContent: 'center' }}>                   
-                        <Text style={styles.textTitle}>{title}</Text>
+                        <Text style={[styles.textTitle, {color: colorText || COLORS.white}]}>{title}</Text>
                 </View>
                 <Pressable onPress={onPressRight}>
                 <View 
@@ -26,7 +26,7 @@ export default function Header({ title, rightIcon, leftIcon ,onPress, onPressRig
                         width:40, 
                         height: 40,
                         justifyContent: 'center' }}>
-                        <Icon name={rightIcon} size={30} color={COLORS.white} />
+                        <Icon name={rightIcon} size={30} color={colorText ||COLORS.white} />
                 </View>
                 </Pressable>
             </View>

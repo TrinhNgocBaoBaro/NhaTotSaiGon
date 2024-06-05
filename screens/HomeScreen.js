@@ -20,18 +20,6 @@ const HomeScreen = ({ navigation }) => {
   return (
     <>
       <View style={styles.top}>
-        {/* <Pressable onPress={() => {}}>
-          <View
-            style={{
-              height: 40,
-              width: 40,
-              marginLeft: 20,
-              justifyContent: "center",
-            }}
-          >
-            <Icon name="chevron-back-outline" size={28} color={"black"} />
-          </View>
-        </Pressable> */}
         <View
           style={{
             justifyContent: "center",
@@ -68,7 +56,7 @@ const HomeScreen = ({ navigation }) => {
           </View>
         </View>
         <View style={{ flexDirection: "row" }}>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => {navigation.navigate("Favourite")}}>
             <View
               style={{
                 marginRight: 10,
@@ -100,14 +88,14 @@ const HomeScreen = ({ navigation }) => {
           backgroundColor: COLORS.white,
         }}
       >
-        <View style={styles.boxInput}>
-          <TextInput
+        <TouchableOpacity activeOpacity={0.7} 
+        onPress={() => {navigation.navigate("Tìm kiếm")}} 
+        style={styles.boxInput}>
+          <Text
             style={styles.input}
-            placeholder="Tìm kiếm nhà trọ, phòng trọ..."
-            // onFocus={() => {navigation.navigate("Tìm kiếm")}}
-          />
+          >Tìm kiếm nhà trọ, phòng trọ...</Text>
           <Icon name="search" size={23} color={COLORS.grey} />
-        </View>
+        </TouchableOpacity>
         <View style={{ marginVertical: 10 }}>
           <View
             style={{
@@ -168,7 +156,7 @@ const HomeScreen = ({ navigation }) => {
                 style={{ height: 200, width: "auto" }}
               />
               <View
-                  style={{ position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
+                  style={{elevation: 2, position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
               >
                   <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>1.500.000 đ</Text>
               </View>
@@ -521,11 +509,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F5",
   },
   input: {
-    height: 36,
     paddingLeft: 15,
     paddingRight: 15,
     fontSize: 16,
     fontFamily: FONTS.medium,
+    color: COLORS.lightGrey,
+    paddingVertical: 8,
     flex: 1,
   },
 });

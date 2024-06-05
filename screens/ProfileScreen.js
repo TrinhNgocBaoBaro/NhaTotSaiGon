@@ -18,28 +18,29 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FONTS from "../constants/font";
-// import createAxios from "../utils/axios";
-// const API = createAxios();
+import createAxios from "../utils/axios";
+const API = createAxios();
 
 const ProfileScreen = ({ navigation }) => {
   const [aboutMe, setAboutMe] = React.useState();
   const [showStationInfo, setShowStationInfo] = React.useState(false);
 
-  // const getDataAboutMe = async ()  => {
-  //   try {
-  //     const response = await API.get("/aboutMe")
-  //     if(response) {
-  //       console.log("Success get aboutMe")
-  //       setAboutMe(response)
-  //     }
-  //   } catch (error) {
+  const getDataAboutMe = async ()  => {
+    try {
+      const response = await API.get(`/account/66518d7a458eef05bbb41c3c`)
+      if(response) {
+        console.log("Success get aboutMe")
+        setAboutMe(response)
+        console.log(response.data)
+      }
+    } catch (error) {
+        console.log(error)
+    }
+  }
 
-  //   }
-  // }
-
-  // React.useEffect(()=>{
-  //   getDataAboutMe();
-  // },[])
+  React.useEffect(()=>{
+    getDataAboutMe();
+  },[])
 
   const cacheAndCellularItems = [
     {
@@ -162,7 +163,7 @@ const ProfileScreen = ({ navigation }) => {
         <View style={styles.itemCard}>
           <Image
             source={{
-              uri: "https://scontent.fsgn15-1.fna.fbcdn.net/v/t39.30808-1/438238559_1143642673426668_6656372791733229549_n.jpg?stp=c2.0.200.200a_dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=-2s72PAG7cEQ7kNvgEXAYaA&_nc_ht=scontent.fsgn15-1.fna&oh=00_AYAE6pxdrTkzfxHAGoHxzJfSAVLf9yEAF-BEkZqeKL7DBw&oe=6660C602",
+              uri: aboutMe ? aboutMe.image : "https://scontent.fsgn15-1.fna.fbcdn.net/v/t39.30808-1/438238559_1143642673426668_6656372791733229549_n.jpg?stp=c2.0.200.200a_dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=-2s72PAG7cEQ7kNvgEXAYaA&_nc_ht=scontent.fsgn15-1.fna&oh=00_AYAE6pxdrTkzfxHAGoHxzJfSAVLf9yEAF-BEkZqeKL7DBw&oe=6660C602",
             }}
             style={{ height: 50, width: 50, borderRadius: 50 }}
           />

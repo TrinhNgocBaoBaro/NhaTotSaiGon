@@ -259,7 +259,7 @@ const LoginScreen = ({ navigation }) => {
         </View>
       </View>
       
-      <Button
+      {/* <Button
       onPress={() => {
         auth()
           .signOut()
@@ -268,7 +268,7 @@ const LoginScreen = ({ navigation }) => {
       }}
       title="Sign out"
       color={"red"}
-    />
+    /> */}
     </ScrollView>
   );
 };

@@ -27,6 +27,7 @@ import FONTS from "./constants/font";
 import CreateAppointmentScreen from "./screens/CreateAppointmentScreen";
 import DoneAppointmentScreen from "./screens/DoneAppointmentScreen";
 import CreatePostScreen from "./screens/CreatePostScreen";
+import FavouriteScreen from "./screens/FavouriteScreen";
 
 const toastConfig = {
   success: (props) => (
@@ -262,6 +263,8 @@ export default function App() {
           <Stack.Screen name="CreateAppointment" component={CreateAppointmentScreen} />
           <Stack.Screen name="DoneAppointment" component={DoneAppointmentScreen} />
           <Stack.Screen name="CreatePost" component={CreatePostScreen} />
+          <Stack.Screen name="Favourite" component={FavouriteScreen} />
+
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />
