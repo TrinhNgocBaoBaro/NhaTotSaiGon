@@ -9,9 +9,23 @@ import { ButtonFloatBottom } from "../components/Button";
 import * as ImagePicker from "expo-image-picker";
 import Toast from 'react-native-toast-message';
 
+import createAxios from "../utils/axios";
+const API = createAxios();
+
 const CreatePostScreen = ({navigation}) => {
 
     const [images, setImages] = React.useState([]);
+    const [title, setTitle] = React.useState("");
+    const [description, setDescription] = React.useState("");
+    const [utilities, setUtilities] = React.useState("");
+    const [price, setPrice] = React.useState("");
+    const [area, setArea] = React.useState("");
+    const [address, setAdress] = React.useState("");
+    const [phone, setPhone] = React.useState("");
+
+    // React.useEffect(() => {
+    //   console.log(price)
+    // }, [price]);
 
     React.useEffect(() => {
         (async () => {
@@ -52,7 +66,7 @@ const CreatePostScreen = ({navigation}) => {
             onPress: () => console.log('Cancel Pressed'),
             style: 'cancel',
           },
-          {text: 'OK', onPress: ()=> {showToast(); navigation.navigate("Lịch hẹn")}},
+          {text: 'OK', onPress: ()=> {createPost(); navigation.navigate("Trang chủ")}},
         ]);
 
         const showToast = () => {
@@ -62,6 +76,69 @@ const CreatePostScreen = ({navigation}) => {
               text2: 'Đăng tin thành công !👋',
             });
           }
+
+          const createPost = async () => {
+            try {
+              const formCreatePost = new FormData();
+
+              images.forEach((image) => {
+                const localUri = image.uri;
+                const filename = localUri.split("/").pop();
+                const fileExtension = filename.split(".").pop();
+          
+                console.log("Local Uri: ", localUri);
+                console.log("File Name: ", filename);
+                console.log("File Extension: ", fileExtension);
+          
+                formCreatePost.append("image", {
+                  uri: localUri,
+                  name: filename,
+                  type: `image/${fileExtension}`,
+                });
+              });
+
+              // const localUri = images.uri;
+              // const filename = localUri.split("/").pop();
+              // const fileExtension = filename.split(".").pop();
+        
+              // console.log("Local Uri: ", localUri);
+              // console.log("File Name: ", filename);
+              // console.log("File Extension: ", fileExtension);
+
+              // formCreatePost.append("list_image_url", {
+              //   uri: localUri,
+              //   name: filename,
+              //   type: `image/${fileExtension}`,
+              // });
+
+
+              formCreatePost.append("author", "6660807eac641bc87d297c7b");
+              formCreatePost.append("title", title);
+              formCreatePost.append("description", description);
+              formCreatePost.append("utilities", utilities);
+              formCreatePost.append("price", price);
+              formCreatePost.append("area", area);
+              formCreatePost.append("address", address);
+              formCreatePost.append("is_active", true);
+
+              console.log("formCreatePost nè: ", formCreatePost); 
+              const response = await API.postWithHeaders(`/post/`, 
+              formCreatePost ,
+              {
+                  "Content-Type": "multipart/form-data",
+              }
+              );
+        
+              if (response) {
+                console.log(response);
+                showToast(); 
+              } else {
+                console.log("Có lỗi khi đăng tin");
+              }
+            } catch (error) {
+              console.log(error);
+            }
+          };   
 
   return (
     <>
@@ -88,6 +165,7 @@ const CreatePostScreen = ({navigation}) => {
                 flex: 1,
               }}
               placeholder="Nhập tiêu đề..."
+              onChangeText={(txt)=>setTitle(txt.trim())}
             />
           </View>
         </View>
@@ -108,9 +186,34 @@ const CreatePostScreen = ({navigation}) => {
                 flex: 1,
               }}
               placeholder="VD: 50 Lê Văn Việt, Hiệp Phú, Quận 9,..."
+              onChangeText={(txt)=>setAdress(txt.trim())}
+
             />
           </View>
         </View>
+
+        <View style={{ marginBottom: 25 }}>
+          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15 }}>
+            Số điện thoại liên hệ <Text style={{ color: COLORS.red }}>*</Text>
+          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Icon name="call" size={20} color={COLORS.orange} />
+            <TextInput
+              style={{
+                borderBottomWidth: 2,
+                borderBottomColor: COLORS.greyPastel,
+                height: 50,
+                marginHorizontal: 10,
+                fontFamily: FONTS.medium,
+                flex: 1,
+              }}
+              placeholder="Nhập số điện thoại..."
+              onChangeText={(txt)=>setPhone(txt.trim())}
+
+            />
+          </View>
+        </View>
+
         <View style={{ marginBottom: 25 }}>
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15 }}>
             Tiện ích <Text style={{ color: COLORS.red }}></Text>
@@ -127,6 +230,8 @@ const CreatePostScreen = ({navigation}) => {
                 flex: 1,
               }}
               placeholder="VD: Wifi miễn phí, điện nước, gần trường học,..."
+              onChangeText={(txt)=>setUtilities(txt.trim())}
+
             />
           </View>
         </View>
@@ -151,6 +256,8 @@ const CreatePostScreen = ({navigation}) => {
               inputMode="numeric"
               keyboardType="numeric"
               placeholder="VNĐ/tháng"
+              onChangeText={(txt)=>setPrice(txt.trim())}
+
             />
           </View>
         </View>
@@ -172,6 +279,8 @@ const CreatePostScreen = ({navigation}) => {
               inputMode="numeric"
               keyboardType="numeric"
               placeholder="Nhập diện tích..."
+              onChangeText={(txt)=>setArea(txt.trim())}
+
             />
           </View>
         </View>
@@ -195,7 +304,7 @@ const CreatePostScreen = ({navigation}) => {
               multiline
               maxLength={150}
               numberOfLines={3}
-            //   onChangeText={(newTextPhone) => setPhone(newTextPhone)}
+              onChangeText={(txt) => setDescription(txt.trim())}
 
             />
           </View>
@@ -227,7 +336,13 @@ const CreatePostScreen = ({navigation}) => {
           </View>
 
       </ScrollView>
-      <ButtonFloatBottom title={"Đăng"} buttonColor={COLORS.orange} onPress={showButtonConfirm}/>
+      <ButtonFloatBottom title={"Đăng"} 
+        buttonColor={
+        images.length > 0 && title && address && utilities && price && area && description ?
+        COLORS.orange : COLORS.grey
+        } 
+        onPress={()=>{if(images.length > 0 && title && address && utilities && price && area && description) showButtonConfirm()} }
+          />
 
     </>
   );

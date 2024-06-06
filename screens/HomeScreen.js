@@ -15,8 +15,36 @@ import COLORS from "../constants/color";
 import Icon from "react-native-vector-icons/Ionicons";
 import FONTS from "../constants/font";
 import TopPlacesCarousel from "../components/TopPlacesCarousel";
+import { formatCurrency, moment } from "../utils";
+
+import createAxios from "../utils/axios";
+const API = createAxios();
 
 const HomeScreen = ({ navigation }) => {
+
+  const [newsFeed, setNewsFeed] = React.useState([]);
+
+  const fetchNewPost = async () => {
+    try {
+      const response = await API.get(`/post/`);
+      if (response) {
+        console.log("Success get all post: ", response.data);
+        const arrayAfterSort = response.data.sort((a,b)=> b.time_created.localeCompare(a.time_created));
+        setNewsFeed(arrayAfterSort);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchNewPost();    
+  }, []);
+
+  React.useEffect(() => {
+    if(newsFeed) newsFeed.map((item)=> console.log(item.time_created))   
+  }, [newsFeed]);
+
   return (
     <>
       <View style={styles.top}>
@@ -69,7 +97,7 @@ const HomeScreen = ({ navigation }) => {
             </View>
           </TouchableOpacity>
           <View style={{ marginRight: 20, justifyContent: "center" }}>
-            <Pressable>
+            <Pressable onPress={fetchNewPost}>
               <Image
                 source={{
                   uri: "https://scontent.fsgn15-1.fna.fbcdn.net/v/t39.30808-1/438238559_1143642673426668_6656372791733229549_n.jpg?stp=c2.0.200.200a_dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=-2s72PAG7cEQ7kNvgEXAYaA&_nc_ht=scontent.fsgn15-1.fna&oh=00_AYAE6pxdrTkzfxHAGoHxzJfSAVLf9yEAF-BEkZqeKL7DBw&oe=6660C602",
@@ -136,9 +164,11 @@ const HomeScreen = ({ navigation }) => {
               <Icon name="options" color={COLORS.grey} size={23}/>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
+          {newsFeed.length > 0 && newsFeed.map((item,index)=>
+           ( <TouchableOpacity
+            key={index}
             activeOpacity={0.8}
-            onPress={()=> navigation.navigate("PostDetail")}
+            onPress={()=> navigation.navigate("PostDetail", {post_id : item._id})}
             style={{
               marginTop: 20,
               marginBottom: 0,
@@ -151,21 +181,21 @@ const HomeScreen = ({ navigation }) => {
             <View style={{}}>
               <Image
                 source={{
-                  uri: "https://pt123.cdn.static123.com/images/thumbs/900x600/fit/2021/02/22/cho-thue-phong-tro_1613975723.jpg",
+                  uri: item.images[0],
                 }}
                 style={{ height: 200, width: "auto" }}
               />
               <View
                   style={{elevation: 2, position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
               >
-                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>1.500.000 đ</Text>
+                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>{formatCurrency(item.price)}</Text>
               </View>
             </View>
             <View style={{ padding: 10 }}>
               <View style={{ flexDirection: "row", marginBottom: 5 }}>
               <Icon name="location-sharp" size={20} color={COLORS.orange} />
                 <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, flexShrink: 1  }}>
-                  Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh
+                  {item.address}.
                 </Text>
               </View>
 
@@ -173,304 +203,17 @@ const HomeScreen = ({ navigation }) => {
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Icon name="file-tray" size={20} color={COLORS.orange} />
                 <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
-                  Diện tích: 50 m2
+                  Diện tích: {item.area} m2
                 </Text>
               </View>
-              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>10 phút trước</Text>
+              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>
+              {moment(item.time_created).fromNow()}
+                </Text>
               </View>
             </View>
           </TouchableOpacity>
-
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={()=> navigation.navigate("PostDetail")}
-            style={{
-              marginTop: 20,
-              marginBottom: 0,
-              elevation: 1,
-              backgroundColor: COLORS.white,
-              borderRadius: 10,
-              overflow: "hidden",
-            }}
-          >
-            <View style={{}}>
-              <Image
-                source={{
-                  uri: "https://baohanam-fileserver.nvcms.net/IMAGES/2023/09/13/20230913181412-97tro.jpg",
-                }}
-                style={{ height: 200, width: "auto" }}
-              />
-              <View
-                  style={{ position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
-              >
-                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>3.000.000 đ</Text>
-              </View>
-            </View>
-            <View style={{ padding: 10 }}>
-              <View style={{ flexDirection: "row", marginBottom: 5 }}>
-              <Icon name="location-sharp" size={20} color={COLORS.orange} />
-                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, flexShrink: 1  }}>
-                  Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh
-                </Text>
-              </View>
-
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Icon name="file-tray" size={20} color={COLORS.orange} />
-                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
-                  Diện tích: 70 m2
-                </Text>
-              </View>
-              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>1 giờ trước</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={()=> navigation.navigate("PostDetail")}
-            style={{
-              marginTop: 20,
-              marginBottom: 0,
-              elevation: 1,
-              backgroundColor: COLORS.white,
-              borderRadius: 10,
-              overflow: "hidden",
-            }}
-          >
-            <View style={{}}>
-              <Image
-                source={{
-                  uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQU_EcqcGnIaUjkMyVVFrgxVEV8HVilApXvx0QFJZRc7wr3DbYLjpwseMEGLTjONbYe7Nk&usqp=CAU",
-                }}
-                style={{ height: 200, width: "auto" }}
-              />
-              <View
-                  style={{ position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
-              >
-                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>750.000 đ</Text>
-              </View>
-            </View>
-            <View style={{ padding: 10 }}>
-              <View style={{ flexDirection: "row", marginBottom: 5 }}>
-              <Icon name="location-sharp" size={20} color={COLORS.orange} />
-                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, flexShrink: 1  }}>
-                  Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh
-                </Text>
-              </View>
-
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Icon name="file-tray" size={20} color={COLORS.orange} />
-                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
-                  Diện tích: 26 m2
-                </Text>
-              </View>
-              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>3 ngày trước</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
-
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={()=> navigation.navigate("PostDetail")}
-            style={{
-              marginTop: 20,
-              marginBottom: 0,
-              elevation: 1,
-              backgroundColor: COLORS.white,
-              borderRadius: 10,
-              overflow: "hidden",
-            }}
-          >
-            <View style={{}}>
-              <Image
-                source={{
-                  uri: "https://vatlieuso.com/wp-content/uploads/2021/10/chi-phi-xay-nha-tro.jpg",
-                }}
-                style={{ height: 200, width: "auto" }}
-              />
-              <View
-                  style={{ position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
-              >
-                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>1.500.000 đ</Text>
-              </View>
-            </View>
-            <View style={{ padding: 10 }}>
-              <View style={{ flexDirection: "row", marginBottom: 5 }}>
-              <Icon name="location-sharp" size={20} color={COLORS.orange} />
-                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, flexShrink: 1  }}>
-                  Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh
-                </Text>
-              </View>
-
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Icon name="file-tray" size={20} color={COLORS.orange} />
-                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
-                  Diện tích: 50 m2
-                </Text>
-              </View>
-              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>10 phút trước</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
-
-
-
-
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={()=> navigation.navigate("PostDetail")}
-            style={{
-              marginTop: 20,
-              marginBottom: 0,
-              elevation: 1,
-              backgroundColor: COLORS.white,
-              borderRadius: 10,
-              overflow: "hidden",
-            }}
-          >
-            <View style={{}}>
-              <Image
-                source={{
-                  uri: "https://baohanam-fileserver.nvcms.net/IMAGES/2023/09/13/20230913181412-97tro.jpg",
-                }}
-                style={{ height: 200, width: "auto" }}
-              />
-              <View
-                  style={{ position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
-              >
-                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>1.500.000 đ</Text>
-              </View>
-            </View>
-            <View style={{ padding: 10 }}>
-              <View style={{ flexDirection: "row", marginBottom: 5 }}>
-              <Icon name="location-sharp" size={20} color={COLORS.orange} />
-                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, flexShrink: 1  }}>
-                  Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh
-                </Text>
-              </View>
-
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Icon name="file-tray" size={20} color={COLORS.orange} />
-                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
-                  Diện tích: 50 m2
-                </Text>
-              </View>
-              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>10 phút trước</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
-
-
-
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={()=> navigation.navigate("PostDetail")}
-            style={{
-              marginTop: 20,
-              marginBottom: 0,
-              elevation: 1,
-              backgroundColor: COLORS.white,
-              borderRadius: 10,
-              overflow: "hidden",
-            }}
-          >
-            <View style={{}}>
-              <Image
-                source={{
-                  uri: "https://baohanam-fileserver.nvcms.net/IMAGES/2023/09/13/20230913181412-97tro.jpg",
-                }}
-                style={{ height: 200, width: "auto" }}
-              />
-              <View
-                  style={{ position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
-              >
-                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>1.500.000 đ</Text>
-              </View>
-            </View>
-            <View style={{ padding: 10 }}>
-              <View style={{ flexDirection: "row", marginBottom: 5 }}>
-              <Icon name="location-sharp" size={20} color={COLORS.orange} />
-                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, flexShrink: 1  }}>
-                  Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh
-                </Text>
-              </View>
-
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Icon name="file-tray" size={20} color={COLORS.orange} />
-                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
-                  Diện tích: 50 m2
-                </Text>
-              </View>
-              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>10 phút trước</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
-
-
-
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={()=> navigation.navigate("PostDetail")}
-            style={{
-              marginTop: 20,
-              marginBottom: 0,
-              elevation: 1,
-              backgroundColor: COLORS.white,
-              borderRadius: 10,
-              overflow: "hidden",
-            }}
-          >
-            <View style={{}}>
-              <Image
-                source={{
-                  uri: "https://baohanam-fileserver.nvcms.net/IMAGES/2023/09/13/20230913181412-97tro.jpg",
-                }}
-                style={{ height: 200, width: "auto" }}
-              />
-              <View
-                  style={{ position: 'absolute', right: 10, bottom: 10, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
-              >
-                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>1.500.000 đ</Text>
-              </View>
-            </View>
-            <View style={{ padding: 10 }}>
-              <View style={{ flexDirection: "row", marginBottom: 5 }}>
-              <Icon name="location-sharp" size={20} color={COLORS.orange} />
-                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, flexShrink: 1  }}>
-                  Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh
-                </Text>
-              </View>
-
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Icon name="file-tray" size={20} color={COLORS.orange} />
-                <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
-                  Diện tích: 50 m2
-                </Text>
-              </View>
-              <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>10 phút trước</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
-
-
-
-
+          )
+          )}
         </View>
       </ScrollView>
     </>

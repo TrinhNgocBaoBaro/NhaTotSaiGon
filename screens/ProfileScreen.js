@@ -19,6 +19,8 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FONTS from "../constants/font";
+import { formatCurrency } from "../utils";
+
 import createAxios from "../utils/axios";
 const API = createAxios();
 
@@ -28,10 +30,10 @@ const ProfileScreen = ({ navigation }) => {
 
   const getDataAboutMe = async () => {
     try {
-      const response = await API.get(`/account/66518d7a458eef05bbb41c3c`);
+      const response = await API.get(`/account/6660807eac641bc87d297c7b`);
       if (response) {
         console.log("Success get aboutMe");
-        setAboutMe(response);
+        setAboutMe(response.data);
         console.log(response.data);
       }
     } catch (error) {
@@ -40,8 +42,13 @@ const ProfileScreen = ({ navigation }) => {
   };
 
   React.useEffect(() => {
-    getDataAboutMe();
+    getDataAboutMe();    
   }, []);
+
+  React.useEffect(() => {
+
+    if(aboutMe)console.log("đmmmm",aboutMe)
+  }, [aboutMe]);
 
   const cacheAndCellularItems = [
     {
@@ -161,10 +168,10 @@ const ProfileScreen = ({ navigation }) => {
           />
           <View style={styles.profileDetails}>
             <Text style={styles.profileName}>
-              Trịnh Ngọc Bảo
+              {aboutMe && aboutMe.name}
             </Text>
             <Text style={styles.profileEmail}>
-              ngbao1592001@gmail.com
+            {aboutMe && aboutMe.email}
             </Text>
           </View>
           <View>
@@ -191,7 +198,7 @@ const ProfileScreen = ({ navigation }) => {
                 <View style={{ alignSelf: "flex-end" }}>
                   <TouchableOpacity>
                     <Icon1
-                      name={"toggle-off"}
+                      name={aboutMe && aboutMe.is_private ? "toggle-on": "toggle-off"}
                       size={24}
                       color="grey"
                       style={{
@@ -303,7 +310,7 @@ const styles = StyleSheet.create({
   },
   profileDetails: {
     height: 100,
-    marginLeft: 25,
+    marginLeft: 15,
     paddingVertical: 32,
     flex: 1,
   },

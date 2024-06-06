@@ -16,14 +16,47 @@ import FONTS from "../constants/font";
 import { ScrollView } from "react-native-gesture-handler";
 import { ButtonFlex, ButtonFloatBottom } from "../components/Button";
 import Modal from "react-native-modal";
+import { formatCurrency, moment } from "../utils";
+import LoadingModal from "../components/LoadingModal";
 
-const PostDetailScreen = ({ navigation }) => {
+import createAxios from "../utils/axios";
+const API = createAxios();
+
+const PostDetailScreen = ({ navigation, route }) => {
+
+  const post_id = route.params.post_id;
 
   const [showMoreDescription, setShowMoreDescription] = React.useState(false);
   const [showModalComment, setShowModalComment] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  const [postDetails, setPostDetails] = React.useState();
+
+  const fetchPostDetails = async () => {
+    try {
+      const response = await API.get(`/post/${post_id}`);
+      if (response) {
+        setPostDetails(response.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setTimeout(setLoad, 2000)
+    }
+  };
+
+  const setLoad = () => setIsLoading(false);
+
+  React.useEffect(() => {
+    if(post_id) fetchPostDetails();    
+  }, []);
+
+
 
   return (
     <>
+      {postDetails && 
+      <>
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{
@@ -41,65 +74,22 @@ const PostDetailScreen = ({ navigation }) => {
             dotColor={COLORS.white}
             paginationStyle={{ marginBottom: 30 }}
           >
-            <View style={styles.slide}>
-              <Image
-                source={{
-                  uri: "https://pt123.cdn.static123.com/images/thumbs/900x600/fit/2021/02/22/cho-thue-phong-tro_1613975723.jpg",
-                }}
-                style={styles.img}
-                resizeMode="cover"
-              />
-            </View>
-            <View style={styles.slide}>
-              <Image
-                source={{
-                  uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQU_EcqcGnIaUjkMyVVFrgxVEV8HVilApXvx0QFJZRc7wr3DbYLjpwseMEGLTjONbYe7Nk&usqp=CAU",
-                }}
-                style={styles.img}
-                resizeMode="cover"
-              />
-            </View>
-            <View style={styles.slide}>
-              <Image
-                source={{
-                  uri: "https://cafefcdn.com/203337114487263232/2022/8/5/83-1659675881831241642789.jpeg",
-                }}
-                style={styles.img}
-                resizeMode="cover"
-              />
-            </View>
-            <View style={styles.slide}>
-              <Image
-                source={{
-                  uri: "https://vatlieuso.com/wp-content/uploads/2021/10/chi-phi-xay-nha-tro.jpg",
-                }}
-                style={styles.img}
-                resizeMode="cover"
-              />
-            </View>
-            <View style={styles.slide}>
-              <Image
-                source={{
-                  uri: "https://cafefcdn.com/203337114487263232/2022/8/5/83-1659675881831241642789.jpeg",
-                }}
-                style={styles.img}
-                resizeMode="cover"
-              />
-            </View>
-            <View style={styles.slide}>
-              <Image
-                source={{
-                  uri: "https://cafefcdn.com/203337114487263232/2022/8/5/83-1659675881831241642789.jpeg",
-                }}
-                style={styles.img}
-                resizeMode="cover"
-              />
-            </View>
+            {postDetails.images.map((item,index)=> (
+                <View style={styles.slide} key={index}>
+                <Image
+                  source={{
+                    uri: item,
+                  }}
+                  style={styles.img}
+                  resizeMode="cover"
+                />
+              </View>
+            ))}
           </Swiper>
           <View
                   style={{elevation: 2, position: 'absolute', right: 10, bottom: 50, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
               >
-                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>11.500.000 đ</Text>
+                  <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>{formatCurrency(postDetails.price)}</Text>
               </View>
         </View>
         <View
@@ -154,7 +144,7 @@ const PostDetailScreen = ({ navigation }) => {
           }}
         >
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }}>
-            Cho thuê phòng trọ quận 9 giá rẻ, thuận đường đi lại,...
+            {postDetails.title}.
           </Text>
 
           <View style={{ flexDirection: "row", marginTop: 20 }}>
@@ -166,7 +156,7 @@ const PostDetailScreen = ({ navigation }) => {
                 flexShrink: 1,
               }}
             >
-              Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9, TP. Hồ Chí Minh.
+               {postDetails.address}.
             </Text>
           </View>
           <View style={{ flexDirection: "row", marginTop: 10 }}>
@@ -178,7 +168,7 @@ const PostDetailScreen = ({ navigation }) => {
                 flexShrink: 1,
               }}
             >
-              11.500.000đ / 1 tháng
+              {formatCurrency(postDetails.price)} / 1 tháng
             </Text>
           </View>
           <View style={{ flexDirection: "row", marginTop: 10 }}>
@@ -202,7 +192,7 @@ const PostDetailScreen = ({ navigation }) => {
                 flexShrink: 1,
               }}
             >
-              Tiện ích: Wifi miễn phí, điện nước, gần chợ, trường học.
+              Tiện ích: {postDetails.utilities}.
             </Text>
           </View>
           <View style={{ flexDirection: "row", marginTop: 10 }}>
@@ -214,7 +204,7 @@ const PostDetailScreen = ({ navigation }) => {
                 flexShrink: 1,
               }}
             >
-              Diện tích: 50 m2
+              Diện tích: {postDetails.area} m2
             </Text>
           </View>
 
@@ -223,12 +213,7 @@ const PostDetailScreen = ({ navigation }) => {
               Mô tả chi tiết
             </Text>
             <Text style={{ fontFamily: FONTS.medium, fontSize: 13, marginTop: 10, lineHeight: 30 }} numberOfLines={showMoreDescription ? undefined : 2}>
-              Cho thuê CCMN tại Cổng Đồng, KDT Văn Khê, Hà Đông Còn 1 phòng Diện
-              tích: 25m2, có gác xép và kho chứa đồ thích hợp cho gia đình ở
-              Khoá vân tay, để xe miễn phí Nhà 7 tầng có thang máy, nhà mới xây
-              xong Nhà liền kề, đường đi 2 ô tô to tránh nhau Tiện ích xung
-              quanh gần trường học, gần chợ, bus nhanh BRT, bus thường, aeon
-              mall hà đông....
+            {postDetails.description}.
             </Text>
             <TouchableOpacity
               onPress={()=> setShowMoreDescription(!showMoreDescription)}
@@ -238,7 +223,9 @@ const PostDetailScreen = ({ navigation }) => {
             </Text>
             </TouchableOpacity>
           </View>
-          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, marginTop: 10, alignSelf: 'flex-end' }}>15 giờ trước</Text>
+          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, marginTop: 10, alignSelf: 'flex-end' }}>           
+          {moment(postDetails.time_created).fromNow()}
+          </Text>
           <View style={{ flexDirection: "row", marginTop: 20 }}>
             <Image
               source={{
@@ -405,6 +392,10 @@ const PostDetailScreen = ({ navigation }) => {
           />
         </View>
       </Modal>
+      </>
+      }
+
+      <LoadingModal modalVisible={isLoading}/>
     </>
   );
 };
