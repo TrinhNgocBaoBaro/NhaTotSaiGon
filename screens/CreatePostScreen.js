@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert, Button } from "react-native";
 import React from "react";
 import Header from "../components/Header";
 import { ScrollView } from "react-native-gesture-handler";
@@ -97,21 +97,6 @@ const CreatePostScreen = ({navigation}) => {
                 });
               });
 
-              // const localUri = images.uri;
-              // const filename = localUri.split("/").pop();
-              // const fileExtension = filename.split(".").pop();
-        
-              // console.log("Local Uri: ", localUri);
-              // console.log("File Name: ", filename);
-              // console.log("File Extension: ", fileExtension);
-
-              // formCreatePost.append("list_image_url", {
-              //   uri: localUri,
-              //   name: filename,
-              //   type: `image/${fileExtension}`,
-              // });
-
-
               formCreatePost.append("author", "6660807eac641bc87d297c7b");
               formCreatePost.append("title", title);
               formCreatePost.append("description", description);
@@ -119,7 +104,7 @@ const CreatePostScreen = ({navigation}) => {
               formCreatePost.append("price", price);
               formCreatePost.append("area", area);
               formCreatePost.append("address", address);
-              formCreatePost.append("is_active", true);
+              formCreatePost.append("is_active", false);
 
               console.log("formCreatePost nè: ", formCreatePost); 
               const response = await API.postWithHeaders(`/post/`, 
@@ -139,6 +124,53 @@ const CreatePostScreen = ({navigation}) => {
               console.log(error);
             }
           };   
+
+          const payment = () => {
+            const line_item = [
+              {
+                 "price_data":{
+                    "currency":"vnd",
+                    "product_data":{
+                       "name":"Bài đăng",
+                       "description":"Bài đăng ứng dụng Nhà Tốt Sài Gòn"
+                    },
+                    "unit_amount": 10000
+                 },
+                 "quantity":1
+              }
+           ]
+           fetch(`${"http://localhost:3000"}/stripe/create-checkout-session`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              currency: "vnd",
+              unit_amount: 10000,
+              line_items: line_item,
+              client_reference_id: "0354187011--HD1234",
+              // stripe_success_url: "https://www.google.com/",
+              // stripe_cancel_url: "https://www.facebook.com/",
+            })
+          })
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(session) {
+            // our server error occurred
+            if (session.error) {
+              console.error('Our server error:', session.error);
+              return session
+            } else {
+              const publish_key = "pk_test_51PFIBzGCFOEiUw2fhze5xe5fTEVhOXW9D7DdwnjTTfXD4CIkpIkDnZMB7zpupgPfhg0uSfgygA1uB7e0scoF96Gu006h9baxGm"
+              var stripe = Stripe(publish_key);
+              return stripe.redirectToCheckout({ sessionId: session.id });
+            }
+          })
+          .catch(function(error) {
+            console.error('Stripe error:', error);
+          });
+          }
 
   return (
     <>
@@ -343,7 +375,7 @@ const CreatePostScreen = ({navigation}) => {
         } 
         onPress={()=>{if(images.length > 0 && title && address && utilities && price && area && description) showButtonConfirm()} }
           />
-
+      {/* <Button title="Checkout" onPress={payment}/> */}
     </>
   );
 };

@@ -15,6 +15,7 @@ const Tab = createBottomTabNavigator();
 import AuthContext, { AuthProvider } from "./context/AuthContext";
 
 import "expo-dev-client";
+import { StripeProvider } from '@stripe/stripe-react-native';
 
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
@@ -74,7 +75,7 @@ const TabRoute = () => {
       tabBarActiveTintColor: COLORS.orange,
       tabBarInactiveTintColor: COLORS.grey,
       tabBarLabelStyle: {
-        fontFamily: FONTS.bold,
+        fontFamily: FONTS.semiBold,
         fontSize: 12,
         marginBottom: 5,
       },
@@ -237,6 +238,8 @@ const TabRoute = () => {
   );
 };
 
+// const STRIPE_KEY = "pk_test_51PFIBzGCFOEiUw2fhze5xe5fTEVhOXW9D7DdwnjTTfXD4CIkpIkDnZMB7zpupgPfhg0uSfgygA1uB7e0scoF96Gu006h9baxGm"
+
 export default function App() {
 
   const [fontsLoaded, fontError] = useFonts({
@@ -252,6 +255,8 @@ export default function App() {
 
   return (
     <AuthProvider>
+    <StripeProvider
+      publishableKey={STRIPE_KEY}>
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
       <AuthContext.Consumer>
@@ -278,6 +283,7 @@ export default function App() {
       </NavigationContainer>
       <Toast config={toastConfig} />
     </GestureHandlerRootView>
+    </StripeProvider>
     </AuthProvider>
 
   );
