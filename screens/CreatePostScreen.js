@@ -10,6 +10,7 @@ import * as ImagePicker from "expo-image-picker";
 import Toast from 'react-native-toast-message';
 import { useStripe } from "@stripe/stripe-react-native";
 import { useIsFocused } from "@react-navigation/native";
+import { getDataAboutMe } from "../utils/api";
 
 import createAxios from "../utils/axios";
 import LoadingModal from "../components/LoadingModal";
@@ -29,11 +30,57 @@ const CreatePostScreen = ({navigation}) => {
     const [address, setAdress] = React.useState("");
     const [phone, setPhone] = React.useState("");
     const [isLoading, setIsLoading] = React.useState(true);
+    const [aboutMe, setAboutMe] = React.useState();
+    const [profileId, setProfileId] = React.useState();
+    const [amount, setAmount] = React.useState(50000);
 
     // React.useEffect(() => {
     //   console.log(price)
     // }, [price]);
+    const fetchDataAboutMe = async () => {
+      try {
+        const data = await getDataAboutMe();
+        setProfileId(data._id);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    const getDataAuthor = async () => {
+      try {
+        const response = await API.get(`/account/${profileId}`);
+        if (response) {
+          console.log("Aboutme: ", response.data)
+          setAboutMe(response.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
+    React.useEffect(() => {
+      fetchDataAboutMe()
+    }, []);
+
+    
+    React.useEffect(() => {
+      if(profileId) getDataAuthor();
+    }, [profileId]);
+
+    const calculatePrice = () => {
+      let amountForNew = amount * 0.5;
+      let amountV = aboutMe.amount_spent >= 100000 ? amount * 0.7 : amount
+
+        if(aboutMe){
+          return aboutMe.is_new === true ? amountForNew : amountV
+        }
+
+        return null;
+    }
+     
+    React.useEffect(() => {
+      if(aboutMe) console.log(calculatePrice())
+    }, [aboutMe]);
+    
     React.useEffect(() => {
         (async () => {
           const { status } =
@@ -67,7 +114,7 @@ const CreatePostScreen = ({navigation}) => {
       };
 
       const showButtonConfirm = () =>
-        Alert.alert('Xác nhận', 'Bạn có muốn hoàn tất đăng tin thuê trọ?', [
+        Alert.alert('Xác nhận', 'Bạn phải thanh toán để được đăng bài, bạn có muốn thanh toán?', [
           {
             text: 'Hủy',
             onPress: () => console.log('Cancel Pressed'),
@@ -104,7 +151,7 @@ const CreatePostScreen = ({navigation}) => {
                 });
               });
 
-              formCreatePost.append("author", "6660807eac641bc87d297c7b");
+              formCreatePost.append("author", "6663bb8c8197429ea3b28182");
               formCreatePost.append("title", title);
               formCreatePost.append("description", description);
               formCreatePost.append("utilities", utilities);
@@ -112,6 +159,8 @@ const CreatePostScreen = ({navigation}) => {
               formCreatePost.append("area", area);
               formCreatePost.append("address", address);
               formCreatePost.append("is_active", false);
+              formCreatePost.append("fee", calculatePrice());
+
 
               console.log("formCreatePost nè: ", formCreatePost); 
               const response = await API.postWithHeaders(`/post/`, 
@@ -123,6 +172,7 @@ const CreatePostScreen = ({navigation}) => {
         
               if (response) {
                 console.log(response);
+                getDataAuthor();
                 showToast(); 
               } else {
                 console.log("Có lỗi khi đăng tin");
@@ -139,17 +189,17 @@ const CreatePostScreen = ({navigation}) => {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                amount: 20000, // Ví dụ: số tiền cần thanh toán (1000 cents = 10 USD)
+                amount: calculatePrice(), // Ví dụ: số tiền cần thanh toán (1000 cents = 10 USD)
               }),
             });
-            if(response) console.log(response.clientSecret)
+            // if(response) console.log(response.clientSecret)
             const { clientSecret } = await response.json();
             return { clientSecret };
           };
 
           const initializePaymentSheet = async () => {
             const { clientSecret } = await fetchPaymentSheetParams();
-              console.log("chạy vào init nè 4 ")
+              console.log("Initializing...")
             const { error } = await initPaymentSheet({
               paymentIntentClientSecret: clientSecret,
               merchantDisplayName: 'Your Merchant Name',
@@ -167,7 +217,8 @@ const CreatePostScreen = ({navigation}) => {
             const { error } = await presentPaymentSheet();
         
             if (error) {
-              Alert.alert(`Error code: ${error.code}`, error.message);
+              // Alert.alert(`Error code: ${error.code}`, error.message);
+              console.log(`Error code: ${error.code}`, error.message)
             } else {
               // Alert.alert('Success', 'Your payment was successful!');
               createPost();
@@ -176,8 +227,8 @@ const CreatePostScreen = ({navigation}) => {
           };
 
           React.useEffect(() => {
-            initializePaymentSheet();
-          }, [isFocused]);
+           if(isFocused, aboutMe) initializePaymentSheet();
+          }, [isFocused, aboutMe]);
         
 
   return (

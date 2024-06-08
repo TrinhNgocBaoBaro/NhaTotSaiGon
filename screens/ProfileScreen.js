@@ -9,48 +9,83 @@ import {
   ScrollView,
   SafeAreaView,
   Alert,
+  RefreshControl
 } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
 import Icon1 from "react-native-vector-icons/FontAwesome";
 
 import auth from "@react-native-firebase/auth";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getDataAboutMe } from "../utils/api";
 import FONTS from "../constants/font";
 import { formatCurrency } from "../utils";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import createAxios from "../utils/axios";
 import COLORS from "../constants/color";
+import LoadingModal from "../components/LoadingModal";
 const API = createAxios();
+import AuthContext from "../context/AuthContext";
 
 const ProfileScreen = ({ navigation }) => {
-  const [aboutMe, setAboutMe] = React.useState();
+  const [aboutMe, setAboutMe] = React.useState(null);
   const [showStationInfo, setShowStationInfo] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const { signInWithGoogle, signOut } = useContext(AuthContext);
+  const [refreshing, setRefreshing] = React.useState(false);
 
-  const getDataAboutMe = async () => {
+  // const getDataAboutMe = async () => {
+  //   try {
+  //     const response = await API.get(`/account/6660807eac641bc87d297c7b`);
+  //     if (response) {
+  //       console.log("Success get aboutMe");
+  //       setAboutMe(response.data);
+  //       console.log(response.data);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  // const getUserData = async () => {
+  //   const UserLoggedInData = await AsyncStorage.getItem("UserLoggedInData")
+  //   // console.log(UserLoggedInData)
+
+  //   if(UserLoggedInData){
+  //     let udata = JSON.parse(UserLoggedInData);
+  //     setAboutMe(udata.data);
+  //     setIsLoading(false);
+
+  //     // console.log("--------udata---------")
+  //     // console.log(udata)
+  //     // console.log("--------udata---------")
+  //   }
+  //}
+  const fetchDataAboutMe = async () => {
     try {
-      const response = await API.get(`/account/6660807eac641bc87d297c7b`);
-      if (response) {
-        console.log("Success get aboutMe");
-        setAboutMe(response.data);
-        console.log(response.data);
-      }
+      const data = await getDataAboutMe();
+      setAboutMe(data);
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   React.useEffect(() => {
-    getDataAboutMe();    
+    fetchDataAboutMe();    
   }, []);
 
   React.useEffect(() => {
 
-    if(aboutMe)console.log("đmmmm",aboutMe)
+    if(aboutMe)setIsLoading(false);
+   
   }, [aboutMe]);
 
+  // if (isLoading) {
+  //   return <LoadingModal modalVisible={isLoading} />;
+  // }
   const cacheAndCellularItems = [
     {
       icon: "shield-checkmark-outline",
@@ -97,15 +132,16 @@ const ProfileScreen = ({ navigation }) => {
         },
         {
           text: "Đăng xuất",
-          onPress: async () => {
-            try {
-              await auth().signOut();
-              await GoogleSignin.signOut();
-              console.log("User signed out!");
-            } catch (error) {
-              console.error("Error signing out: ", error);
-            }
-          },
+          // onPress: async () => {
+          //   try {
+          //     await auth().signOut();
+          //     await GoogleSignin.signOut();
+          //     console.log("User signed out!");
+          //   } catch (error) {
+          //     console.error("Error signing out: ", error);
+          //   }
+          // },
+          onPress: signOut
         },
       ],
       { cancelable: false }
@@ -155,109 +191,117 @@ const ProfileScreen = ({ navigation }) => {
           </Pressable>
         </View>
       </SafeAreaView>
-      <ScrollView
-        style={{ flex: 1, backgroundColor: "white" }}
-        contentContainerStyle={{ paddingBottom: 80 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.itemCard}>
-          <Image
-            source={{
-              uri: aboutMe ? aboutMe.image : "https://scontent.fsgn15-1.fna.fbcdn.net/v/t39.30808-1/438238559_1143642673426668_6656372791733229549_n.jpg?stp=c2.0.200.200a_dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=-2s72PAG7cEQ7kNvgEXAYaA&_nc_ht=scontent.fsgn15-1.fna&oh=00_AYAE6pxdrTkzfxHAGoHxzJfSAVLf9yEAF-BEkZqeKL7DBw&oe=6660C602",
-            }}
-            style={styles.profileImage}
-          />
-          <View style={styles.profileDetails}>
-            <Text style={styles.profileName}>
-              {aboutMe && aboutMe.name}
-            </Text>
-            <Text style={styles.profileEmail}>
-            {aboutMe && aboutMe.email}
-            </Text>
-          </View>
-          <View>
-            <Icon name="notifications-outline" size={26} color={"grey"} />
-          </View>
-        </View>
-
-        <View style={{ marginHorizontal: 20 }}>
-          <View style={{ marginBottom: 12 }}>
-            <Text style={styles.sectionTitle}>Tài khoản</Text>
-            <View style={styles.sectionContainer}>
-              <TouchableOpacity
-                activeOpacity={1}
-                style={styles.settingsItem}
-              >
-                <Icon
-                  name={"shield-checkmark-outline"}
-                  size={24}
-                  color="grey"
-                />
-                <Text style={styles.settingsText}>
-                  {"Quyền riêng tư"}
-                </Text>
-                <View style={{ alignSelf: "flex-end" }}>
-                  <TouchableOpacity>
-                    <Icon1
-                      name={aboutMe && aboutMe.is_private ? "toggle-on": "toggle-off"}
-                      size={24}
-                      color={aboutMe && aboutMe.is_private ? COLORS.orange :  COLORS.grey}
-                      style={{
-                        fontWeight: "600",
-                        fontSize: 24,
-                      }}
-                    />
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={1}
-                style={styles.settingsItem}
-              >
-                <Icon name={"person-circle-outline"} size={24} color="grey" />
-                <Text style={styles.settingsText}>
-                  {"Thông tin tài khoản"}
-                </Text>
-                <View style={{ alignSelf: "flex-end" }}>
-                  <TouchableOpacity
-                  onPress={()=> navigation.navigate("EditProfile")}
-                  >
-                  <Icon
-                    name={"create-outline"}
-                    size={24}
-                    color="grey"
-                    style={{
-                      fontWeight: "600",
-                      fontSize: 24,
-                    }}
-                  />
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={{ marginBottom: 12 }}>
-            <Text style={styles.sectionTitle}>Cài đặt</Text>
-            <View style={styles.sectionContainer}>
-              {accountItems.map((item, index) => (
-                <React.Fragment key={index}>
-                  {renderSettingsItem(item)}
-                </React.Fragment>
-              ))}
-            </View>
-          </View>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={{ justifyContent: "center", alignItems: "center" }}
-            onPress={handleLogOut}
+      {aboutMe ? 
+            <ScrollView
+            style={{ flex: 1, backgroundColor: "white" }}
+            contentContainerStyle={{ paddingBottom: 80 }}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={fetchDataAboutMe}/>
+            }
           >
-            <View style={styles.btnContainer}>
-              <Text style={styles.btnText}>Đăng xuất</Text>
+            <View style={styles.itemCard}>
+              <Image
+                source={{
+                  uri: aboutMe ? aboutMe.image : "https://img.freepik.com/free-photo/abstract-surface-textures-white-concrete-stone-wall_74190-8189.jpg",
+                }}
+                style={styles.profileImage}
+              />
+              <View style={styles.profileDetails}>
+                <Text style={styles.profileName}>
+                  {aboutMe && aboutMe.name}
+                </Text>
+                <Text style={styles.profileEmail}>
+                {aboutMe && aboutMe.email}
+                </Text>
+              </View>
+              <View>
+                <Icon name="notifications-outline" size={26} color={"grey"} />
+              </View>
             </View>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+    
+            <View style={{ marginHorizontal: 20 }}>
+              <View style={{ marginBottom: 12 }}>
+                <Text style={styles.sectionTitle}>Tài khoản</Text>
+                <View style={styles.sectionContainer}>
+                  <TouchableOpacity
+                    activeOpacity={1}
+                    style={styles.settingsItem}
+                  >
+                    <Icon
+                      name={"shield-checkmark-outline"}
+                      size={24}
+                      color="grey"
+                    />
+                    <Text style={styles.settingsText}>
+                      {"Quyền riêng tư"}
+                    </Text>
+                    <View style={{ alignSelf: "flex-end" }}>
+                      <View>
+                        <Icon1
+                          name={aboutMe && aboutMe.is_private ? "toggle-on": "toggle-off"}
+                          size={24}
+                          color={aboutMe && aboutMe.is_private ? COLORS.orange :  COLORS.grey}
+                          style={{
+                            fontWeight: "600",
+                            fontSize: 24,
+                          }}
+                        />
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    activeOpacity={1}
+                    style={styles.settingsItem}
+                  >
+                    <Icon name={"person-circle-outline"} size={24} color="grey" />
+                    <Text style={styles.settingsText}>
+                      {"Thông tin tài khoản"}
+                    </Text>
+                    <View style={{ alignSelf: "flex-end" }}>
+                      <TouchableOpacity
+                      onPress={()=> navigation.navigate("EditProfile", {profile_id: aboutMe._id})}
+                      >
+                      <Icon
+                        name={"create-outline"}
+                        size={24}
+                        color="grey"
+                        style={{
+                          fontWeight: "600",
+                          fontSize: 24,
+                        }}
+                      />
+                      </TouchableOpacity>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+    
+              <View style={{ marginBottom: 12 }}>
+                <Text style={styles.sectionTitle}>Cài đặt</Text>
+                <View style={styles.sectionContainer}>
+                  {accountItems.map((item, index) => (
+                    <React.Fragment key={index}>
+                      {renderSettingsItem(item)}
+                    </React.Fragment>
+                  ))}
+                </View>
+              </View>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={{ justifyContent: "center", alignItems: "center" }}
+                onPress={handleLogOut}
+              >
+                <View style={styles.btnContainer}>
+                  <Text style={styles.btnText}>Đăng xuất</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+          :
+          <LoadingModal modalVisible={isLoading}/>
+      }
+
     </>
   );
 };

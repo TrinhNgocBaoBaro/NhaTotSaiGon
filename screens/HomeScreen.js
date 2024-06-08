@@ -17,18 +17,30 @@ import FONTS from "../constants/font";
 import TopPlacesCarousel from "../components/TopPlacesCarousel";
 import { formatCurrency, moment } from "../utils";
 
+import { getDataAboutMe } from "../utils/api";
+import LoadingModal from "../components/LoadingModal";
+import { useIsFocused } from "@react-navigation/native";
+
 import createAxios from "../utils/axios";
 const API = createAxios();
 
 const HomeScreen = ({ navigation }) => {
+  const isFocused = useIsFocused();
 
   const [newsFeed, setNewsFeed] = React.useState([]);
+  const [aboutMe, setAboutMe] = React.useState();
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  const fetchDataAboutMe = async () => {
+    const data = await getDataAboutMe();
+    setAboutMe(data);
+  };
 
   const fetchNewPost = async () => {
     try {
       const response = await API.get(`/post/`);
       if (response) {
-        console.log("Success get all post: ", response.data);
+        console.log("Success get post")
         const arrayAfterSort = response.data.sort((a,b)=> b.time_created.localeCompare(a.time_created));
         setNewsFeed(arrayAfterSort);
       }
@@ -38,9 +50,24 @@ const HomeScreen = ({ navigation }) => {
   };
 
   React.useEffect(() => {
-    fetchNewPost();    
+    const fetchDataHome = async () => {
+    try {
+      await Promise.all([fetchDataAboutMe(), fetchNewPost()]);
+    } catch (error) {
+      console.error('Error fetching data: ', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  fetchDataHome();
   }, []);
 
+
+  if (isLoading) {
+    return <LoadingModal modalVisible={isLoading} />;
+  }
+
+ 
   // React.useEffect(() => {
   //   if(newsFeed) newsFeed.map((item)=> console.log(item.time_created))   
   // }, [newsFeed]);
@@ -114,7 +141,7 @@ const HomeScreen = ({ navigation }) => {
              <Pressable onPress={fetchNewPost}>
               <Image
                 source={{
-                  uri: "https://lh3.googleusercontent.com/a/ACg8ocL-zaTUS9DJSiGYQ2kkuMKQUlMDzi6NFpbS3_w0CBZTZyp-5w=s96-c",
+                  uri: aboutMe ? aboutMe.image : "https://img.freepik.com/free-photo/abstract-surface-textures-white-concrete-stone-wall_74190-8189.jpg" ,
                 }}
                 style={{ height: 45, width: 45, borderRadius: 50 }}
               />

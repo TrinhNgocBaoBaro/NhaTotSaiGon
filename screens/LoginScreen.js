@@ -7,6 +7,7 @@ import {
   Image,
   TextInput,
   ScrollView,
+  Button
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import COLORS from "../constants/color";
@@ -15,7 +16,7 @@ import { ButtonFlex } from "../components/Button";
 import AuthContext from "../context/AuthContext";
 
 const LoginScreen = () => {
-  const { signInWithGoogle } = useContext(AuthContext);
+  const { signInWithGoogle, signOut } = useContext(AuthContext);
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -81,6 +82,11 @@ const LoginScreen = () => {
           <Text style={{ fontFamily: FONTS.bold }}>Đăng nhập với Google</Text>
         </TouchableOpacity>
       </View>
+      {/* <Button
+      onPress={signOut}
+      title="Sign out"
+      color={"red"}
+    /> */}
     </ScrollView>
   );
 };

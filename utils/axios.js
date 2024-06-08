@@ -75,12 +75,28 @@ const createAxios = () => {
         throw new Error(`POST request to ${endpoint} failed: ${error.message}`);
       });
   };
+
+  const putWithHeaders = (endpoint, data, customHeaders) => {
+    return api
+      .put(endpoint, data, {
+        headers: {
+          ...api.defaults.headers,
+          ...customHeaders, // Thêm các headers tùy chỉnh ở đây
+        },
+      })
+      .then((response) => response.data)
+      .catch((error) => {
+        throw new Error(`PUT request to ${endpoint} failed: ${error.message}`);
+      });
+  };
+
   return {
     get,
     getWithData,
     post,
     postWithHeaders,
-    put
+    put,
+    putWithHeaders
   };
 };
 

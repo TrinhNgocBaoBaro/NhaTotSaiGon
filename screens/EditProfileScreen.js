@@ -2,7 +2,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
   Image,
   TouchableOpacity,
   TextInput,
@@ -11,7 +10,6 @@ import {
 import React from "react";
 import Header from "../components/Header";
 import COLORS from "../constants/color";
-import { CardField, useStripe } from "@stripe/stripe-react-native";
 import FONTS from "../constants/font";
 import Icon from "react-native-vector-icons/Ionicons";
 import Icon1 from "react-native-vector-icons/FontAwesome";
@@ -19,17 +17,63 @@ import Icon2 from "react-native-vector-icons/MaterialIcons";
 import LoadingModal from "../components/LoadingModal";
 import { ButtonFloatBottom } from "../components/Button";
 import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const EditProfileScreen = ({ navigation }) => {
-  const [cardDetails, setCardDetails] = React.useState();
-  const { confirmPayment, initPaymentSheet, presentPaymentSheet } = useStripe();
+import createAxios from "../utils/axios";
+const API = createAxios();
 
-  const [aboutMe, setAboutMe] = React.useState(true);
+const EditProfileScreen = ({ navigation, route }) => {
+  const profile_id = route.params.profile_id
+
+  const [aboutMe, setAboutMe] = React.useState();
   const [isLoading, setIsLoading] = React.useState(true);
-  const [name, setName] = React.useState("Trịnh Ngọc Bảo");
-  const [address, setAddress] = React.useState("50 Lê Văn Việt, Hiệp Phú, Quận 9, TP. Hồ Chí Minh");
-  const [phone, setPhone] = React.useState("0838439296");
+  const [isLoadingUpdate, setIsLoadingUpdate] = React.useState(false);
+
+  const [name, setName] = React.useState();
+  const [address, setAddress] = React.useState();
+  const [phone, setPhone] = React.useState();
+  const [isPrivate, setIsPrivate] = React.useState();
+
   const [images, setImages] = React.useState();
+  const [noti, setNoti] = React.useState();
+
+   const getDataAboutMe = async () => {
+    try {
+      const response = await API.get(`/account/${profile_id}`);
+      if (response) {
+        setAboutMe(response.data);
+        AsyncStorage.setItem('UserLoggedInData', JSON.stringify(response.data));
+      }
+    } catch (error) {
+      console.log(error);
+    }finally{
+      setIsLoading(false)
+    }
+  };
+
+  React.useEffect(() => {
+    if(aboutMe) {
+      setName(aboutMe.name);
+      setAddress(aboutMe.address);
+      setPhone(aboutMe.phone);
+      setIsPrivate(aboutMe.is_private)
+    }
+  }, [aboutMe]);
+
+  // React.useEffect(() => {
+  //   if(aboutMe) {
+  //      AsyncStorage.setItem('UserLoggedInData', JSON.stringify(aboutMe));
+  //   }
+  // }, [aboutMe]);
+
+  React.useEffect(() => {
+      console.log("Private nès:", typeof isPrivate + " | chữ: " + isPrivate)
+  }, [isPrivate]);
+
+
+  React.useEffect(() => {
+    if(profile_id) getDataAboutMe();
+  }, [profile_id]);
 
   React.useEffect(() => {
     (async () => {
@@ -40,6 +84,7 @@ const EditProfileScreen = ({ navigation }) => {
       }
     })();
   }, []);
+  
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -58,18 +103,59 @@ const EditProfileScreen = ({ navigation }) => {
     }
   };
 
-  const handlePayPress = async () => {
-    const initResponse = await initPaymentSheet({
-      merchantDisplayName: "NhaTotSaiGon",
-    });
-    await presentPaymentSheet();
-  };
 
-  React.useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-  }, []);
+  const updateProfile = async () => {
+    setIsLoadingUpdate(true);
+    setNoti();
+    try {
+      const formUpdateProfile = new FormData();
+
+      if(images) {
+        const localUri = images.uri;
+        const filename = localUri.split("/").pop();
+        const fileExtension = filename.split(".").pop();
+  
+        console.log("Local Uri: ", localUri);
+        console.log("File Name: ", filename);
+        console.log("File Extension: ", fileExtension);
+  
+        formUpdateProfile.append("image", {
+          uri: localUri,
+          name: filename,
+          type: `image/${fileExtension}`,
+        });
+      }
+     
+      formUpdateProfile.append("name", name.trim());
+      formUpdateProfile.append("phone", phone.trim());
+      formUpdateProfile.append("address", address.trim());
+      formUpdateProfile.append("is_private", isPrivate);
+
+
+      const response = await API.putWithHeaders(`/account/${profile_id}`, 
+        formUpdateProfile,
+      {
+          "Content-Type": "multipart/form-data",
+      }
+      );
+
+      if (response) {
+        console.log(response);
+        getDataAboutMe();
+        setNoti("Cập nhật thông tin thành công!")
+        setIsLoadingUpdate(false)
+       
+      } else {
+        console.log("Có lỗi cập nhật");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };  
+
+  if (isLoading) {
+    return <LoadingModal modalVisible={isLoading} />;
+  }
 
   return (
     <>
@@ -82,13 +168,13 @@ const EditProfileScreen = ({ navigation }) => {
         onPress={() => navigation.goBack()}
       />
       <ScrollView
-        style={{ flex: 1, backgroundColor: COLORS.white, padding: 20 }}contentContainerStyle={{paddingBottom: 100}}
+        style={{ flex: 1, backgroundColor: COLORS.white, padding: 20 }} contentContainerStyle={{paddingBottom: 100}}
       >
         <View style={{ alignItems: "center", marginBottom: 20 }}>
           <View>
             <Image
               source={{
-                uri: images ? images.uri : "https://lh3.googleusercontent.com/a/ACg8ocL-zaTUS9DJSiGYQ2kkuMKQUlMDzi6NFpbS3_w0CBZTZyp-5w=s96-c",
+                uri: images ? images.uri || "https://img.pikbest.com/origin/09/19/03/61zpIkbEsTGjk.jpg!w700wp" : aboutMe.image,
               }}
               style={{
                 width: 120,
@@ -123,7 +209,7 @@ const EditProfileScreen = ({ navigation }) => {
                 marginRight: 5,
               }}
             >
-              Trịnh Ngọc Bảo
+              {aboutMe && aboutMe.name}
             </Text>
             <Text
               style={{
@@ -132,8 +218,8 @@ const EditProfileScreen = ({ navigation }) => {
                 color: COLORS.grey,
               }}
             >
-              ngbao1592001@gmail.com
-            </Text>
+              {aboutMe && aboutMe.email}
+              </Text>
           </View>
         </View>
 
@@ -148,11 +234,11 @@ const EditProfileScreen = ({ navigation }) => {
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15 }}>
             Quyền riêng tư
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=> setIsPrivate(!isPrivate)}>
             <Icon1
-              name={aboutMe && aboutMe ? "toggle-on" : "toggle-off"}
+              name={isPrivate && isPrivate ? "toggle-on" : "toggle-off"}
               size={28}
-              color={aboutMe && aboutMe ? COLORS.orange : COLORS.grey}
+              color={isPrivate && isPrivate? COLORS.orange : COLORS.grey}
             />
           </TouchableOpacity>
         </View>
@@ -218,29 +304,20 @@ const EditProfileScreen = ({ navigation }) => {
                 fontFamily: FONTS.medium,
                 flex: 1,
               }}
-              placeholder="VD: 50 Lê Văn Việt, Hiệp Phú, Quận 9,..."
+              placeholder="Nhập số điện thoại..."
               onChangeText={(txt)=>setPhone(txt)}
               value={phone}
             />
           </View>
         </View>
+        <View style={{ marginBottom: 25, marginHorizontal: 40, alignItems: 'center', paddingVertical: 10, borderRadius: 5 }}>
+        <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, color: COLORS.green }}>
+            {noti && noti}
+          </Text>
+        </View>
       </ScrollView>
-      <ButtonFloatBottom title={"Cập nhật"} buttonColor={COLORS.orange} />
-      {/* <View style={styles.container}>
-      <CardField
-        postalCodeEnabled={true}
-        placeholders={{
-          number: '4242 4242 4242 4242',
-        }}
-        cardStyle={styles.card}
-        style={styles.cardContainer}
-        onCardChange={(cardDetails) => {
-          setCardDetails(cardDetails);
-        }}
-      />
-      <Button onPress={()=> {handlePayPress(); console.log("haha")}} title="Pay" disabled={!cardDetails?.complete} />
-    </View> */}
-      <LoadingModal modalVisible={isLoading} />
+      <ButtonFloatBottom title={"Cập nhật"} buttonColor={COLORS.orange} onPress={updateProfile} />
+      <LoadingModal modalVisible={isLoadingUpdate} />
     </>
   );
 };

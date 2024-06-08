@@ -41,7 +41,7 @@ const PostDetailScreen = ({ navigation, route }) => {
     } catch (error) {
       console.log(error);
     } finally {
-      setTimeout(setLoad, 2000)
+      setTimeout(setLoad, 1000)
     }
   };
 
@@ -229,13 +229,13 @@ const PostDetailScreen = ({ navigation, route }) => {
           <View style={{ flexDirection: "row", marginTop: 20 }}>
             <Image
               source={{
-                uri: "https://scontent.fsgn15-1.fna.fbcdn.net/v/t39.30808-1/438238559_1143642673426668_6656372791733229549_n.jpg?stp=c2.0.200.200a_dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=-2s72PAG7cEQ7kNvgEXAYaA&_nc_ht=scontent.fsgn15-1.fna&oh=00_AYAE6pxdrTkzfxHAGoHxzJfSAVLf9yEAF-BEkZqeKL7DBw&oe=6660C602",
+                uri: postDetails.author.image || "https://scontent.fsgn15-1.fna.fbcdn.net/v/t39.30808-1/438238559_1143642673426668_6656372791733229549_n.jpg?stp=c2.0.200.200a_dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=-2s72PAG7cEQ7kNvgEXAYaA&_nc_ht=scontent.fsgn15-1.fna&oh=00_AYAE6pxdrTkzfxHAGoHxzJfSAVLf9yEAF-BEkZqeKL7DBw&oe=6660C602",
               }}
               style={{ height: 50, width: 50, borderRadius: 50 }}
             />
             <View style={{ marginLeft: 10 }}>
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }}>
-                Nguyễn Lê Hữu
+                {postDetails.author.name}
               </Text>
               <Text style={{ fontFamily: FONTS.medium, fontSize: 12, marginTop: 5, color: COLORS.grey}}>
                 Người đăng tin
