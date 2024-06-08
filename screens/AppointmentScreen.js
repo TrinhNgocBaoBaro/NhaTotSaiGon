@@ -11,10 +11,10 @@ const AppointmentScreen = () => {
       <Header title={'Lịch hẹn'} leftIcon={"calendar-outline"} colorBackground={COLORS.orange} colorText={COLORS.white}/>
       <View style={{flexDirection: 'row', }}>
         <TouchableOpacity style={{flex: 1, alignItems: 'center', alignSelf: 'center', paddingVertical: 20, borderBottomWidth: 3, borderBottomColor: COLORS.orange}}>
-          <Text style={{fontFamily:  FONTS.semiBold, fontSize: 15, color: COLORS.orange}}>Người hẹn</Text>
+          <Text style={{fontFamily:  FONTS.semiBold, fontSize: 15, color: COLORS.orange}}>Sắp tới</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{flex: 1, alignItems: 'center', alignSelf: 'center', paddingVertical: 20}}>
-          <Text style={{fontFamily:  FONTS.semiBold, fontSize: 15}}>Bạn hẹn</Text>
+          <Text style={{fontFamily:  FONTS.semiBold, fontSize: 15}}>Chờ xác nhận</Text>
         </TouchableOpacity>
       </View>
       <View style={{backgroundColor: COLORS.white, flex: 1}}>

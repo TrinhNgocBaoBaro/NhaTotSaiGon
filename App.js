@@ -31,6 +31,8 @@ import DoneAppointmentScreen from "./screens/DoneAppointmentScreen";
 import CreatePostScreen from "./screens/CreatePostScreen";
 import FavouriteScreen from "./screens/FavouriteScreen";
 import SplashScreen from "./screens/SplashScreen";
+import EditProfileScreen from "./screens/EditProfileScreen";
+import ListPostScreen from "./screens/ListPostScreen";
 
 const toastConfig = {
   success: (props) => (
@@ -273,6 +275,8 @@ export default function App() {
           <Stack.Screen name="DoneAppointment" component={DoneAppointmentScreen} />
           <Stack.Screen name="CreatePost" component={CreatePostScreen} />
           <Stack.Screen name="Favourite" component={FavouriteScreen} />
+          <Stack.Screen name="ListPost" component={ListPostScreen} />
+          <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           </>
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />

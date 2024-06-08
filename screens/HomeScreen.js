@@ -41,9 +41,9 @@ const HomeScreen = ({ navigation }) => {
     fetchNewPost();    
   }, []);
 
-  React.useEffect(() => {
-    if(newsFeed) newsFeed.map((item)=> console.log(item.time_created))   
-  }, [newsFeed]);
+  // React.useEffect(() => {
+  //   if(newsFeed) newsFeed.map((item)=> console.log(item.time_created))   
+  // }, [newsFeed]);
 
   return (
     <>
@@ -83,7 +83,7 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.textTitle}>Sài Gòn</Text>
           </View>
         </View>
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", alignItems: 'center' }}>
           <TouchableOpacity onPress={() => {navigation.navigate("Favourite")}}>
             <View
               style={{
@@ -96,15 +96,29 @@ const HomeScreen = ({ navigation }) => {
               <Icon name={"heart-outline"} size={40} color={"orange"} />
             </View>
           </TouchableOpacity>
+          <View style={{justifyContent: "center" }}>
+            <TouchableOpacity onPress={() => {navigation.navigate("ListPost")}}>
+            <View
+              style={{
+                marginRight: 10,
+                width: 40,
+                height: 40,
+                justifyContent: "center",
+              }}
+            >
+              <Icon name={"newspaper"} size={35} color={"orange"} />
+            </View>
+          </TouchableOpacity>
+          </View>
           <View style={{ marginRight: 20, justifyContent: "center" }}>
-            <Pressable onPress={fetchNewPost}>
+             <Pressable onPress={fetchNewPost}>
               <Image
                 source={{
-                  uri: "https://scontent.fsgn15-1.fna.fbcdn.net/v/t39.30808-1/438238559_1143642673426668_6656372791733229549_n.jpg?stp=c2.0.200.200a_dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=-2s72PAG7cEQ7kNvgEXAYaA&_nc_ht=scontent.fsgn15-1.fna&oh=00_AYAE6pxdrTkzfxHAGoHxzJfSAVLf9yEAF-BEkZqeKL7DBw&oe=6660C602",
+                  uri: "https://lh3.googleusercontent.com/a/ACg8ocL-zaTUS9DJSiGYQ2kkuMKQUlMDzi6NFpbS3_w0CBZTZyp-5w=s96-c",
                 }}
-                style={{ height: 40, width: 40, borderRadius: 50 }}
+                style={{ height: 45, width: 45, borderRadius: 50 }}
               />
-            </Pressable>
+            </Pressable> 
           </View>
         </View>
       </View>

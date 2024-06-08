@@ -8,11 +8,17 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { ButtonFloatBottom } from "../components/Button";
 import * as ImagePicker from "expo-image-picker";
 import Toast from 'react-native-toast-message';
+import { useStripe } from "@stripe/stripe-react-native";
+import { useIsFocused } from "@react-navigation/native";
 
 import createAxios from "../utils/axios";
+import LoadingModal from "../components/LoadingModal";
 const API = createAxios();
 
 const CreatePostScreen = ({navigation}) => {
+    const isFocused = useIsFocused();
+
+    const {initPaymentSheet, presentPaymentSheet } = useStripe();
 
     const [images, setImages] = React.useState([]);
     const [title, setTitle] = React.useState("");
@@ -22,6 +28,7 @@ const CreatePostScreen = ({navigation}) => {
     const [area, setArea] = React.useState("");
     const [address, setAdress] = React.useState("");
     const [phone, setPhone] = React.useState("");
+    const [isLoading, setIsLoading] = React.useState(true);
 
     // React.useEffect(() => {
     //   console.log(price)
@@ -66,7 +73,7 @@ const CreatePostScreen = ({navigation}) => {
             onPress: () => console.log('Cancel Pressed'),
             style: 'cancel',
           },
-          {text: 'OK', onPress: ()=> {createPost(); navigation.navigate("Trang chủ")}},
+          {text: 'OK', onPress: ()=> {openPaymentSheet();}},
         ]);
 
         const showToast = () => {
@@ -125,52 +132,53 @@ const CreatePostScreen = ({navigation}) => {
             }
           };   
 
-          const payment = () => {
-            const line_item = [
-              {
-                 "price_data":{
-                    "currency":"vnd",
-                    "product_data":{
-                       "name":"Bài đăng",
-                       "description":"Bài đăng ứng dụng Nhà Tốt Sài Gòn"
-                    },
-                    "unit_amount": 10000
-                 },
-                 "quantity":1
-              }
-           ]
-           fetch(`${"http://localhost:3000"}/stripe/create-checkout-session`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              currency: "vnd",
-              unit_amount: 10000,
-              line_items: line_item,
-              client_reference_id: "0354187011--HD1234",
-              // stripe_success_url: "https://www.google.com/",
-              // stripe_cancel_url: "https://www.facebook.com/",
-            })
-          })
-          .then(function(response) {
-            return response.json();
-          })
-          .then(function(session) {
-            // our server error occurred
-            if (session.error) {
-              console.error('Our server error:', session.error);
-              return session
+          const fetchPaymentSheetParams = async () => {
+            const response = await fetch('http://192.168.1.3:3000/stripe/create-payment-intent', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                amount: 20000, // Ví dụ: số tiền cần thanh toán (1000 cents = 10 USD)
+              }),
+            });
+            if(response) console.log(response.clientSecret)
+            const { clientSecret } = await response.json();
+            return { clientSecret };
+          };
+
+          const initializePaymentSheet = async () => {
+            const { clientSecret } = await fetchPaymentSheetParams();
+              console.log("chạy vào init nè 4 ")
+            const { error } = await initPaymentSheet({
+              paymentIntentClientSecret: clientSecret,
+              merchantDisplayName: 'Your Merchant Name',
+              style: 'alwaysDark', // Optional
+            });
+        
+            if (!error) {
+              setIsLoading(false);
             } else {
-              const publish_key = "pk_test_51PFIBzGCFOEiUw2fhze5xe5fTEVhOXW9D7DdwnjTTfXD4CIkpIkDnZMB7zpupgPfhg0uSfgygA1uB7e0scoF96Gu006h9baxGm"
-              var stripe = Stripe(publish_key);
-              return stripe.redirectToCheckout({ sessionId: session.id });
+              Alert.alert(`Error code: ${error.code}`, error.message);
             }
-          })
-          .catch(function(error) {
-            console.error('Stripe error:', error);
-          });
-          }
+          };
+
+          const openPaymentSheet = async () => {
+            const { error } = await presentPaymentSheet();
+        
+            if (error) {
+              Alert.alert(`Error code: ${error.code}`, error.message);
+            } else {
+              // Alert.alert('Success', 'Your payment was successful!');
+              createPost();
+              navigation.navigate("ListPost")
+            }
+          };
+
+          React.useEffect(() => {
+            initializePaymentSheet();
+          }, [isFocused]);
+        
 
   return (
     <>
@@ -375,7 +383,8 @@ const CreatePostScreen = ({navigation}) => {
         } 
         onPress={()=>{if(images.length > 0 && title && address && utilities && price && area && description) showButtonConfirm()} }
           />
-      {/* <Button title="Checkout" onPress={payment}/> */}
+      {/* <Button title="Checkout" onPress={openPaymentSheet}/> */}
+      <LoadingModal modalVisible={isLoading}/>
     </>
   );
 };

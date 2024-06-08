@@ -22,6 +22,7 @@ import FONTS from "../constants/font";
 import { formatCurrency } from "../utils";
 
 import createAxios from "../utils/axios";
+import COLORS from "../constants/color";
 const API = createAxios();
 
 const ProfileScreen = ({ navigation }) => {
@@ -200,7 +201,7 @@ const ProfileScreen = ({ navigation }) => {
                     <Icon1
                       name={aboutMe && aboutMe.is_private ? "toggle-on": "toggle-off"}
                       size={24}
-                      color="grey"
+                      color={aboutMe && aboutMe.is_private ? COLORS.orange :  COLORS.grey}
                       style={{
                         fontWeight: "600",
                         fontSize: 24,
@@ -218,6 +219,9 @@ const ProfileScreen = ({ navigation }) => {
                   {"Thông tin tài khoản"}
                 </Text>
                 <View style={{ alignSelf: "flex-end" }}>
+                  <TouchableOpacity
+                  onPress={()=> navigation.navigate("EditProfile")}
+                  >
                   <Icon
                     name={"create-outline"}
                     size={24}
@@ -227,6 +231,7 @@ const ProfileScreen = ({ navigation }) => {
                       fontSize: 24,
                     }}
                   />
+                  </TouchableOpacity>
                 </View>
               </TouchableOpacity>
             </View>
@@ -278,12 +283,13 @@ const styles = StyleSheet.create({
   },
   btnContainer: {
     backgroundColor: "red",
-    height: 45,
+    height: 40,
     width: 150,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 20,
+    elevation: 3
   },
   top: {
     marginTop: StatusBar.currentHeight,
