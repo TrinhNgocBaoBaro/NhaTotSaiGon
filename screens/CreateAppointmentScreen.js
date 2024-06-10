@@ -18,19 +18,19 @@ import { ButtonFloatBottom } from "../components/Button";
 const time = [
   {
     id: "1",
-    time: "8:00",
+    time: "08:00",
   },
   {
     id: "2",
-    time: "8:30",
+    time: "08:30",
   },
   {
     id: "3",
-    time: "9:00",
+    time: "09:00",
   },
   {
     id: "4",
-    time: "9:30",
+    time: "09:30",
   },
   {
     id: "5",

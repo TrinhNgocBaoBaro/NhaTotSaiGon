@@ -1,13 +1,29 @@
-import { StyleSheet, Text, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  Dimensions,
+} from "react-native";
 import React from "react";
-import LoadingModal from "../components/LoadingModal";
+// import LoadingModal from "../components/LoadingModal";
 import COLORS from "../constants/color";
+const { width, height } = Dimensions.get("window");
 
 const SplashScreen = () => {
   return (
     <>
-      <View style={{ backgroundColor: COLORS.orange, flex: 1 }}></View>
-      <LoadingModal modalVisible={true} color={'white'} />
+      <ScrollView style={{ backgroundColor: COLORS.white, flex: 1 }}>
+        {/* <LoadingModal modalVisible={true} color={'white'} /> */}
+        <View style={{ width: width, height: height }}>
+          <Image
+            source={require("../assets/splash.png")}
+            resizeMode="cover"
+            style={{ width: "100%", height: "100%" }}
+          />
+        </View>
+      </ScrollView>
     </>
   );
 };

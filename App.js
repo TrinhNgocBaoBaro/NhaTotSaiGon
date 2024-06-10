@@ -33,6 +33,7 @@ import FavouriteScreen from "./screens/FavouriteScreen";
 import SplashScreen from "./screens/SplashScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import ListPostScreen from "./screens/ListPostScreen";
+import LoadingModal from "./components/LoadingModal";
 
 const toastConfig = {
   success: (props) => (
@@ -70,7 +71,7 @@ const toastConfig = {
 };
 
 
-const TabRoute = () => {
+const TabRoute = ({ userId }) => {
   return (
     <Tab.Navigator
     screenOptions={({ route }) => ({
@@ -90,6 +91,7 @@ const TabRoute = () => {
       <Tab.Screen
         name="Trang chủ"
         component={HomeScreen}
+        initialParams={{userId}}
         options={{
           tabBarIcon: ({ focused, color, size }) => {
             return focused ? (
@@ -262,27 +264,70 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
       <AuthContext.Consumer>
-      {({ user, initializing }) => (
+      {({ user, initializing, userId }) => 
+      {
+        console.log("Init ở App:", initializing)
+      
+        // if(initializing) {
+        //   return  (
+        //     <Stack.Navigator screenOptions={{ headerShown: false }}>
+        //       <Stack.Screen name="Splash" component={SplashScreen} />
+        //     </Stack.Navigator>
+        //   )
+        // } else {
+        //   if(user && userId){
+        //     return  (
+        //       <Stack.Navigator screenOptions={{ headerShown: false }}>
+        //           <Stack.Screen name="Home">
+        //               {props => <TabRoute {...props} userId={userId} />}
+        //           </Stack.Screen>
+
+        //             <Stack.Screen name="PostDetail" component={PostDetailScreen} initialParams={{user_id: userId}} />
+        //           <Stack.Screen name="CreateAppointment" component={CreateAppointmentScreen} />
+        //           <Stack.Screen name="DoneAppointment" component={DoneAppointmentScreen} />
+        //           <Stack.Screen name="CreatePost" component={CreatePostScreen} />
+        //           <Stack.Screen name="Favourite" component={FavouriteScreen} />
+        //           <Stack.Screen name="ListPost" component={ListPostScreen} initialParams={{user_id: userId}} />
+        //           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+        //           {/* <Stack.Screen name="Splash" component={SplashScreen} />   */}
+        //       </Stack.Navigator>
+        //     )
+        //   }else {
+        //     return  (
+        //       <Stack.Navigator screenOptions={{ headerShown: false }}>
+        //         <Stack.Screen name="Login" component={LoginScreen}/>
+        //       </Stack.Navigator>
+        //     )
+        //   }
+        // }
+
+      return (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {initializing ? (
-          // You can add a splash screen here
+        {
+        initializing ? (
           <Stack.Screen name="Splash" component={SplashScreen} />
-        ) : user ? (
+
+        ) : 
+        (user && userId) ? (
           <>
-          <Stack.Screen name="Home" component={TabRoute} />
-          <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+          <Stack.Screen name="Home">
+            {props => <TabRoute {...props} userId={userId} />}
+          </Stack.Screen>
+          <Stack.Screen name="PostDetail" component={PostDetailScreen} initialParams={{user_id: userId}} />
           <Stack.Screen name="CreateAppointment" component={CreateAppointmentScreen} />
           <Stack.Screen name="DoneAppointment" component={DoneAppointmentScreen} />
           <Stack.Screen name="CreatePost" component={CreatePostScreen} />
           <Stack.Screen name="Favourite" component={FavouriteScreen} />
-          <Stack.Screen name="ListPost" component={ListPostScreen} />
+          <Stack.Screen name="ListPost" component={ListPostScreen} initialParams={{user_id: userId}} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           </>
         ) : (
-          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} initialParams={{initializing: initializing}} />
         )}
       </Stack.Navigator>
-        )}
+    )
+  }  
+        }
         </AuthContext.Consumer>
       </NavigationContainer>
       <Toast config={toastConfig} />

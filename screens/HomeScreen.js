@@ -17,23 +17,40 @@ import FONTS from "../constants/font";
 import TopPlacesCarousel from "../components/TopPlacesCarousel";
 import { formatCurrency, moment } from "../utils";
 
-import { getDataAboutMe } from "../utils/api";
 import LoadingModal from "../components/LoadingModal";
-import { useIsFocused } from "@react-navigation/native";
+import { useIsFocused, useRoute } from "@react-navigation/native";
 
 import createAxios from "../utils/axios";
 const API = createAxios();
 
 const HomeScreen = ({ navigation }) => {
-  const isFocused = useIsFocused();
 
+  const route = useRoute();
+  const { userId } = route?.params;
+  const isFocused = useIsFocused();
   const [newsFeed, setNewsFeed] = React.useState([]);
   const [aboutMe, setAboutMe] = React.useState();
   const [isLoading, setIsLoading] = React.useState(true);
+  const [avatar, setAvatar] = React.useState();
 
-  const fetchDataAboutMe = async () => {
-    const data = await getDataAboutMe();
-    setAboutMe(data);
+  // const fetchAvatar = async () => {
+  //   try {
+  //     const data = await getAvatarUser();
+  //     setAvatar(data);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+
+  const getAvatar = async () => {
+    try {
+      const response = await API.get(`/account/${userId}`);
+      if (response) {
+        setAvatar(response.data.image);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const fetchNewPost = async () => {
@@ -52,7 +69,7 @@ const HomeScreen = ({ navigation }) => {
   React.useEffect(() => {
     const fetchDataHome = async () => {
     try {
-      await Promise.all([fetchDataAboutMe(), fetchNewPost()]);
+      await Promise.all([getAvatar(), fetchNewPost()]);
     } catch (error) {
       console.error('Error fetching data: ', error);
     } finally {
@@ -63,14 +80,9 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
 
-  if (isLoading) {
+  if (isLoading && !avatar) {
     return <LoadingModal modalVisible={isLoading} />;
   }
-
- 
-  // React.useEffect(() => {
-  //   if(newsFeed) newsFeed.map((item)=> console.log(item.time_created))   
-  // }, [newsFeed]);
 
   return (
     <>
@@ -138,10 +150,10 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
           </View>
           <View style={{ marginRight: 20, justifyContent: "center" }}>
-             <Pressable onPress={fetchNewPost}>
+             <Pressable onPress={()=>{navigation.navigate("Tài khoản")}}>
               <Image
                 source={{
-                  uri: aboutMe ? aboutMe.image : "https://img.freepik.com/free-photo/abstract-surface-textures-white-concrete-stone-wall_74190-8189.jpg" ,
+                  uri: avatar ? avatar : "https://img.freepik.com/free-photo/abstract-surface-textures-white-concrete-stone-wall_74190-8189.jpg" ,
                 }}
                 style={{ height: 45, width: 45, borderRadius: 50 }}
               />
@@ -201,14 +213,14 @@ const HomeScreen = ({ navigation }) => {
             }}
           >
           <Text style={{ fontFamily: FONTS.bold, fontSize: 18 }}>Tin mới nhất</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>{navigation.navigate("Splash")}}>
               <Icon name="options" color={COLORS.grey} size={23}/>
             </TouchableOpacity>
           </View>
           {newsFeed.length > 0 && newsFeed.map((item,index)=>
            ( <TouchableOpacity
             key={index}
-            activeOpacity={0.8}
+            activeOpacity={0.9}
             onPress={()=> navigation.navigate("PostDetail", {post_id : item._id})}
             style={{
               marginTop: 20,
@@ -244,7 +256,7 @@ const HomeScreen = ({ navigation }) => {
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Icon name="file-tray" size={20} color={COLORS.orange} />
                 <Text style={{ fontFamily: FONTS.medium, marginLeft: 5, fontSize: 14 }}>
-                  Diện tích: {item.area} m2
+                  Diện tích: {item.area} m²
                 </Text>
               </View>
               <Text style={{fontFamily: FONTS.semiBold, color: COLORS.grey, fontSize: 13}}>
@@ -257,6 +269,7 @@ const HomeScreen = ({ navigation }) => {
           )}
         </View>
       </ScrollView>
+
     </>
   );
 };

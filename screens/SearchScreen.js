@@ -18,23 +18,23 @@ import { ButtonFlex } from "../components/Button";
 const dataAreaFilter = [
   {
     id: 1,
-    data: "Dưới 20 m2",
+    data: "Dưới 20 m²",
   },
   {
     id: 2,
-    data: "20 - 30 m2",
+    data: "20 - 30 m²",
   },
   {
     id: 3,
-    data: "30 - 40 m2",
+    data: "30 - 40 m²",
   },
   {
     id: 4,
-    data: "40 - 50 m2",
+    data: "40 - 50 m²",
   },
   {
     id: 5,
-    data: "Trên 50 m2",
+    data: "Trên 50 m²",
   },
 ];
 
@@ -118,7 +118,7 @@ const searchList = [
   {
     id: "7",
     name: "Maison Mận-Đỏ",
-    address: "27J Đ. Trần Nhật Duật, Phường Tân Định, Quận 1",
+    address: "27J Đ. Trần Nhật Duật, Phường Tân Định, Quận 1, TP.Hồ Chí Minh",
     time: "75",
     image:
       "https://baohanam-fileserver.nvcms.net/IMAGES/2023/09/13/20230913181412-97tro.jpg",
@@ -244,7 +244,7 @@ const SearchScreen = ({navigation}) => {
                     marginTop: 25,
                   }}
                 >
-                  Lọc theo diện tích (m2)
+                  Lọc theo diện tích (m²)
                 </Text>
 
                 <FlatList
@@ -356,7 +356,7 @@ const SearchScreen = ({navigation}) => {
                         marginTop: 5,
                       }}
                     >
-                      Diện tích: {item.time} m2
+                      Diện tích: {item.time} m²
                     </Text>
                     <Text
                       style={{

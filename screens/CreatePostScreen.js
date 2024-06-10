@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message';
 import { useStripe } from "@stripe/stripe-react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { getDataAboutMe } from "../utils/api";
-
+import { formatCurrency } from "../utils";
 import createAxios from "../utils/axios";
 import LoadingModal from "../components/LoadingModal";
 const API = createAxios();
@@ -157,8 +157,9 @@ const CreatePostScreen = ({navigation}) => {
               formCreatePost.append("utilities", utilities);
               formCreatePost.append("price", price);
               formCreatePost.append("area", area);
+              formCreatePost.append("phone", phone);
               formCreatePost.append("address", address);
-              formCreatePost.append("is_active", false);
+              formCreatePost.append("is_active", true);
               formCreatePost.append("fee", calculatePrice());
 
 
@@ -227,7 +228,7 @@ const CreatePostScreen = ({navigation}) => {
           };
 
           React.useEffect(() => {
-           if(isFocused, aboutMe) initializePaymentSheet();
+           if(isFocused && aboutMe) initializePaymentSheet();
           }, [isFocused, aboutMe]);
         
 
@@ -236,7 +237,7 @@ const CreatePostScreen = ({navigation}) => {
       <Header
         title={"Đăng tin"}
         leftIcon={"close"}
-        rightIcon={"newspaper-outline"}
+        rightIcon={"information-circle-outline"}
         onPress={() => navigation.goBack()}
       />
       <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1, backgroundColor: COLORS.white, marginBottom: 80}} contentContainerStyle={{ padding: 20}}>
@@ -354,7 +355,7 @@ const CreatePostScreen = ({navigation}) => {
         </View>
         <View style={{ marginBottom: 25, width: '50%' }}>
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15 }}>
-            Diện tích (m2) <Text style={{ color: COLORS.red }}>*</Text>
+            Diện tích (m²) <Text style={{ color: COLORS.red }}>*</Text>
           </Text>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Icon name="file-tray" size={18} color={COLORS.orange} />
@@ -427,13 +428,15 @@ const CreatePostScreen = ({navigation}) => {
           </View>
 
       </ScrollView>
-      <ButtonFloatBottom title={"Đăng"} 
+      {aboutMe && 
+      <ButtonFloatBottom title={`Đăng (${formatCurrency(calculatePrice())})`} 
         buttonColor={
         images.length > 0 && title && address && utilities && price && area && description ?
         COLORS.orange : COLORS.grey
         } 
         onPress={()=>{if(images.length > 0 && title && address && utilities && price && area && description) showButtonConfirm()} }
           />
+        }
       {/* <Button title="Checkout" onPress={openPaymentSheet}/> */}
       <LoadingModal modalVisible={isLoading}/>
     </>

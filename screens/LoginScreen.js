@@ -14,9 +14,16 @@ import COLORS from "../constants/color";
 import FONTS from "../constants/font";
 import { ButtonFlex } from "../components/Button";
 import AuthContext from "../context/AuthContext";
+import LoadingModal from "../components/LoadingModal";
 
-const LoginScreen = () => {
+const LoginScreen = ({ route }) => {
   const { signInWithGoogle, signOut } = useContext(AuthContext);
+  // const { initializing } = route.params
+  
+  // React.useEffect(()=>{
+  //   console.log("Alo: ", initializing);
+  // },[])
+
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -34,6 +41,7 @@ const LoginScreen = () => {
           </View>
         </View>
       </View>
+      <View style={{ backgroundColor: COLORS.orange }}>
       <View style={styles.formContainer}>
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Tên đăng nhập <Text style={{ color: COLORS.red }}>*</Text></Text>
@@ -82,11 +90,13 @@ const LoginScreen = () => {
           <Text style={{ fontFamily: FONTS.bold }}>Đăng nhập với Google</Text>
         </TouchableOpacity>
       </View>
+      </View>
       {/* <Button
       onPress={signOut}
       title="Sign out"
       color={"red"}
     /> */}
+     {/* <LoadingModal modalVisible={initializing}/> */}
     </ScrollView>
   );
 };

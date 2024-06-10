@@ -174,7 +174,7 @@ const EditProfileScreen = ({ navigation, route }) => {
           <View>
             <Image
               source={{
-                uri: images ? images.uri || "https://img.pikbest.com/origin/09/19/03/61zpIkbEsTGjk.jpg!w700wp" : aboutMe.image,
+                uri: images ? images.uri || "https://img.pikbest.com/origin/09/19/03/61zpIkbEsTGjk.jpg!w700wp" : (aboutMe && aboutMe.image),
               }}
               style={{
                 width: 120,

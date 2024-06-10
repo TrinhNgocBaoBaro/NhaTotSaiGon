@@ -133,7 +133,7 @@ const FavouriteScreen = ({ navigation }) => {
                       marginTop: 5
                     }}
                   >
-                    Diện tích: {item.time} m2
+                    Diện tích: {item.time} m²
                   </Text>
                 </View>
                 <Icon onPress={()=>{console.log("haha")}} name="trash-outline" color={COLORS.orange} size={24} style={{alignSelf: 'center'}}/> 

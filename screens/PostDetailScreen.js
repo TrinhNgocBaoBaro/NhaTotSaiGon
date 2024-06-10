@@ -18,17 +18,26 @@ import { ButtonFlex, ButtonFloatBottom } from "../components/Button";
 import Modal from "react-native-modal";
 import { formatCurrency, moment } from "../utils";
 import LoadingModal from "../components/LoadingModal";
-
+import { getDataAboutMe } from "../utils/api";
 import createAxios from "../utils/axios";
 const API = createAxios();
 
 const PostDetailScreen = ({ navigation, route }) => {
 
-  const post_id = route.params.post_id;
+  const { post_id, user_id } = route.params;
+
+  React.useEffect(() => {
+   console.log("User_id_initParams: ",user_id)
+  }, [user_id]);
 
   const [showMoreDescription, setShowMoreDescription] = React.useState(false);
   const [showModalComment, setShowModalComment] = React.useState(false);
+  const [showModalProfile, setShowModalProfile] = React.useState(false);
+
   const [isLoading, setIsLoading] = React.useState(true);
+  const [comment, setComment] = React.useState();
+  const [aboutMe, setAboutMe] = React.useState(null);
+  const [profile, setProfile] = React.useState(null);
 
   const [postDetails, setPostDetails] = React.useState();
 
@@ -45,9 +54,79 @@ const PostDetailScreen = ({ navigation, route }) => {
     }
   };
 
+  const fetchDataAboutMe = async () => {
+    try {
+      const data = await getDataAboutMe();
+      setAboutMe(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const createComment = async () => {
+    if(!comment) return;
+    try {
+      const response = await API.put(`/post/comments/${post_id}`,
+        {
+          account_id: aboutMe._id,
+          displayName: aboutMe.name,
+          photoURL: aboutMe.image,
+          is_private: aboutMe.is_private,
+          content: comment.trim()
+        });
+      if (response) {
+        setComment();
+        setShowModalComment(!showModalComment);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      fetchPostDetails()
+    }
+  };
+
+  const fetchDataProfile = async (account_id) => {
+    setIsLoading(true)
+    try {
+      const response = await API.get(`/account/${account_id}`);
+      if (response) {
+        setProfile(response.data);
+        console.log("Profile: ", response.data)
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false)
+      setShowModalProfile(!showModalProfile)
+    }
+  };
+
+    const createFavourite = async () => {
+    try {
+      const response = await API.post(`/favorite-post/`,
+        {
+          renter_id: user_id,
+          post_id: post_id,
+          image_url: postDetails.images[0],
+          address: postDetails.address,
+          area: postDetails.area
+        });
+      if (response) {
+        // setComment();
+        // setShowModalComment(!showModalComment);
+        console.log("Success")
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      // fetchPostDetails()
+    }
+  };
+
   const setLoad = () => setIsLoading(false);
 
   React.useEffect(() => {
+    fetchDataAboutMe();
     if(post_id) fetchPostDetails();    
   }, []);
 
@@ -116,7 +195,7 @@ const PostDetailScreen = ({ navigation, route }) => {
               <Icon name="arrow-back-outline" size={28} color={COLORS.orange} />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.5} onPress={() => {}}>
+          <TouchableOpacity activeOpacity={0.5} onPress={createFavourite}>
             <View
               style={{
                 height: 50,
@@ -204,7 +283,7 @@ const PostDetailScreen = ({ navigation, route }) => {
                 flexShrink: 1,
               }}
             >
-              Diện tích: {postDetails.area} m2
+              Diện tích: {postDetails.area} m²
             </Text>
           </View>
 
@@ -245,16 +324,21 @@ const PostDetailScreen = ({ navigation, route }) => {
 
           <View style={{ marginTop: 30 }}>
             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }}>
-              Bình luận (6)
+              Bình luận ({postDetails.comments.length})
             </Text>
-            <View style={{ marginTop: 20, flexDirection: "row" }}>
+            {postDetails.comments.length > 0 ? 
+            postDetails.comments.map((comment,index)=>(
+            <TouchableOpacity 
+            onPress={()=> !comment.is_private ? fetchDataProfile(comment.account_id) : {}}
+            activeOpacity={0.5} 
+            style={{ marginTop: 20, flexDirection: "row" }} key={index}>
               <Image
                 source={{
-                  uri: "https://scontent.fsgn15-1.fna.fbcdn.net/v/t39.30808-6/431764296_1830389587405425_4880708078341224054_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=5f2048&_nc_ohc=QjPmZD9JHD0Q7kNvgEL-Wsi&_nc_ht=scontent.fsgn15-1.fna&oh=00_AYD3t1W87C8rLL-lx1PRLla7sdAE0jL3ICn8nABInCFT5w&oe=66637A1D",
+                  uri: comment.is_private ? "https://i.sstatic.net/l60Hf.png" : comment.photoURL,
                 }}
-                style={{ height: 35, width: 35, borderRadius: 50 }}
+                style={{ height: 35, width: 35, borderRadius: 50,borderWidth: !comment.is_private ? 1:0, borderColor: COLORS.orange }}
               />
-              <View style={{ marginLeft: 15, height: "auto", width: "80%" }}>
+              <View style={{ marginLeft: 15, height: "auto", maxWidth: "85%" }}>
                 <Text
                   style={{
                     fontFamily: FONTS.semiBold,
@@ -262,7 +346,7 @@ const PostDetailScreen = ({ navigation, route }) => {
                     color: COLORS.orange,
                   }}
                 >
-                  Trịnh Ngọc Bảo
+                  {comment.is_private ? "Ẩn danh" : comment.displayName}
                 </Text>
                 <View
                   style={{
@@ -272,90 +356,18 @@ const PostDetailScreen = ({ navigation, route }) => {
                   }}
                 >
                   <Text style={{ fontFamily: FONTS.medium }}>
-                    Nhấn zô hiện pop up hoặc qua trang cá nhân của ngta xem
-                    thông tin đúng k
+                  {comment.content}
                   </Text>
                 </View>
               </View>
+            </TouchableOpacity>
+             ))
+            : 
+            <View style={{flexDirection: 'column', alignItems: 'center', height: 300, justifyContent: 'center'}}>
+               <Icon name="chatbox-ellipses-outline" size={40} color={COLORS.lightGrey}/>
+              <Text style={{fontFamily: FONTS.medium, color: COLORS.lightGrey, fontSize: 16, marginTop: 10}}>Chưa có bình luận</Text>
             </View>
-
-            <View style={{ marginTop: 20, flexDirection: "row" }}>
-              <Image
-                source={{
-                  uri: "https://i.sstatic.net/l60Hf.png",
-                }}
-                style={{ height: 35, width: 35, borderRadius: 50 }}
-              />
-               <View style={{ marginLeft: 15, height: "auto", width: "80%" }}>
-
-              <Text
-                  style={{
-                    fontFamily: FONTS.semiBold,
-                    marginBottom: 5,
-                    color: COLORS.orange,
-                  }}
-                >
-                  Ẩn danh
-                </Text>
-              <View
-                style={{
-                  backgroundColor: COLORS.darkGrey,
-                  padding: 10,
-                  borderRadius: 10,
-                }}
-              >
-                <Text style={{ fontFamily: FONTS.medium }}>
-                  Người thuê thôi chứ người cho thuê t nghĩ là bỏ caia nút đó đi
-                </Text>
-              </View>
-              </View>
-            </View>
-
-            <View style={{ marginTop: 20, flexDirection: "row" }}>
-              <Image
-                source={{
-                  uri: "https://static.vecteezy.com/system/resources/previews/019/879/186/non_2x/user-icon-on-transparent-background-free-png.png",
-                }}
-                style={{ height: 35, width: 35, borderRadius: 50 }}
-              />
-              <View
-                style={{
-                  marginLeft: 15,
-                  height: "auto",
-                  width: "80%",
-                  backgroundColor: COLORS.darkGrey,
-                  padding: 10,
-                  borderRadius: 10,
-                }}
-              >
-                <Text style={{ fontFamily: FONTS.medium }}>
-                  Thường bên m hiện ra mới dùng chứ xử lý dưới be chi
-                </Text>
-              </View>
-            </View>
-
-            <View style={{ marginTop: 20, flexDirection: "row" }}>
-              <Image
-                source={{
-                  uri: "https://i.sstatic.net/l60Hf.png",
-                }}
-                style={{ height: 35, width: 35, borderRadius: 50 }}
-              />
-              <View
-                style={{
-                  marginLeft: 15,
-                  height: "auto",
-                  width: "80%",
-                  backgroundColor: COLORS.darkGrey,
-                  padding: 10,
-                  borderRadius: 10,
-                }}
-              >
-                <Text style={{ fontFamily: FONTS.medium }}>
-                  Còn lưu db string thì m xử lý sao zô db cho nó đúng
-                </Text>
-              </View>
-            </View>
+            }
           </View>
         </View>
       </ScrollView>
@@ -369,10 +381,20 @@ const PostDetailScreen = ({ navigation, route }) => {
       <ButtonFloatBottom title="Đặt lịch hẹn" buttonColor={COLORS.orange} onPress={()=>navigation.navigate("CreateAppointment")}/>
       <Modal isVisible={showModalComment} 
              onBackdropPress={()=> setShowModalComment(!showModalComment)}
-             animationOutTiming={800}
+             animationOutTiming={300}
+             animationInTiming={300}
+
+             hasBackdrop={false}
+             backdropColor="#f5f5f5"
+             animationIn={"fadeInUp"}
+             animationOut={"fadeOut"}
+
       >
-        <View style={{width: 'auto', height: 'auto', backgroundColor: COLORS.white, borderRadius: 10, padding: 20}}>
+        <View style={{width: 'auto', height: 'auto', backgroundColor: COLORS.white, borderRadius: 10, padding: 20, borderWidth: 2, borderColor: COLORS.orange}}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
           <Text style={{fontFamily: FONTS.semiBold, fontSize: 18}}>Bình luận</Text>
+          <Icon name="close-circle" size={34} color={COLORS.orange} onPress={()=> setShowModalComment(!showModalComment)}/>
+          </View>
           <TextInput
             style={{    
               height: 56,
@@ -384,12 +406,121 @@ const PostDetailScreen = ({ navigation, route }) => {
               marginVertical: 20
               }}
             placeholder="Aa..."
-            maxLength={60}
+            maxLength={80}
+            onChangeText={(txt)=>setComment(txt.trim())}
           />
-          <ButtonFlex title={"Gửi"} onPress={()=>setShowModalComment(!showModalComment)} 
+          <ButtonFlex title={"Gửi"} onPress={createComment} 
                       stylesText={{fontSize: 16, fontFamily: FONTS.semiBold}}
-                      stylesButton={{paddingVertical: 15}}
+                      stylesButton={{paddingVertical: 15, backgroundColor: comment ? COLORS.orange : COLORS.grey}}
           />
+        </View>
+      </Modal>
+      <Modal isVisible={showModalProfile} 
+             onBackdropPress={()=> setShowModalProfile(!showModalProfile)}
+             animationOutTiming={300}
+             animationInTiming={300}
+
+             hasBackdrop={true}
+             animationIn={"slideInRight"}
+             animationOut={"slideOutRight"}
+
+      >
+        <View style={{overflow: 'hidden',width: '100%', height: '100%', backgroundColor: COLORS.darkGrey, borderRadius: 10, borderWidth: 0, borderColor: COLORS.orange}}>
+          <View style={{backgroundColor: COLORS.orange, paddingVertical: 15, alignItems: 'center',flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20}}>
+            <Icon name="person" size={25} color={COLORS.white}/>
+            <Text style={{fontFamily: FONTS.semiBold, fontSize: 18, color: COLORS.white }}>Thông tin chi tiết</Text>
+            <Icon name="close" size={30} color={COLORS.white} onPress={()=> setShowModalProfile(!showModalProfile)}/>
+          </View>
+          <View style={{ flex: 1, alignItems: 'center'}}>
+          <View style={styles.grayBackground}></View>
+
+            <View style={{padding: 5, backgroundColor: COLORS.white,  borderRadius: 150, marginTop: 50}}>
+              <Image
+                  source={{
+                    uri: profile ? profile.image : "https://i.sstatic.net/l60Hf.png",
+                  }}
+                  style={{ height: 150, width: 150, borderRadius: 150}}
+              />
+            </View>
+            <Text style={{fontFamily: FONTS.semiBold, fontSize: 18, color: COLORS.black, marginTop: 15 }}>{profile && profile.name}</Text>
+            
+            {/* <View style={{backgroundColor: COLORS.white, flexDirection: 'row', height: 'auto', marginHorizontal: 10}}>
+            <Icon name="location-sharp" size={40} color={COLORS.orange} />
+            </View> */}
+<View style={{ flex: 1, alignItems: 'center', marginTop: 25}}>
+    <TouchableOpacity activeOpacity={0.7} 
+      style={styles.itemInfo}
+    >
+      <Icon name={"mail-outline"} size={40} color={COLORS.orange} />
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          flexDirection: "row",
+          marginLeft: 15,   
+        }}
+      >
+        <Text
+          style={{
+            color: COLORS.black,
+            fontFamily: FONTS.semiBold,
+          }}
+        >
+          {profile && profile.email}
+        </Text>
+      </View>
+    </TouchableOpacity>
+    <TouchableOpacity activeOpacity={0.7} 
+      style={styles.itemInfo}
+    >
+      <Icon name={"call-outline"} size={40} color={COLORS.orange} />
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          flexDirection: "row",
+          marginLeft: 15,
+        }}
+      >
+        <Text
+          style={{
+            color: COLORS.black,
+            fontFamily: FONTS.semiBold,
+          }}
+        >
+           {(profile && profile.phone !== "") ? profile.phone : 'Chưa có thông tin'}
+           </Text>
+      </View>
+    </TouchableOpacity>
+    <TouchableOpacity activeOpacity={0.7} 
+      style={styles.itemInfo}
+    >
+      <Icon name={"location-outline"} size={40} color={COLORS.orange} />
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          flexDirection: "row",
+          marginLeft: 15,
+        }}
+      >
+        <Text
+          style={{
+            color: COLORS.black,
+            fontFamily: FONTS.semiBold,
+          }}
+        >
+           {(profile && profile.address !== "") ? profile.address : 'Chưa có thông tin'}
+        </Text>
+      </View>
+    </TouchableOpacity>
+    {/* <ButtonFlex title={"Đóng"} onPress={()=>setShowModalComment(!showModalComment)}
+                      stylesText={{fontSize: 16, fontFamily: FONTS.semiBold}}
+                      stylesButton={{paddingVertical: 15, paddingHorizontal: 30, backgroundColor: COLORS.orange}}
+          /> */}
+</View>
+          </View>
+         
         </View>
       </Modal>
       </>
@@ -432,4 +563,22 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
   },
+  grayBackground: {
+    position: "absolute",
+    top: 130,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: COLORS.greyPastel,
+  },
+  itemInfo: {
+    flexDirection: "row",
+    height: "auto",
+    backgroundColor: COLORS.white,
+    marginHorizontal: 20,
+    marginBottom: 15,
+    borderRadius: 10,
+    elevation: 1,
+    padding: 20,
+  }
 });
