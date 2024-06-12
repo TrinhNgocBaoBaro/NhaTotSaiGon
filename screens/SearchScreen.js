@@ -190,9 +190,10 @@ const SearchScreen = ({navigation}) => {
               isVisible={showModalFilters}
               onBackdropPress={() => setShowModalFilters(!showModalFilters)}
               animationOutTiming={800}
-              animationInTiming={1000}
-              animationIn={"fadeIn"}
-              animationOut={"fadeOut"}
+              animationInTiming={300}
+              animationIn={"fadeInUp"}
+              animationOut={"fadeOutDown"}
+              hasBackdrop={true}
             >
               <View
                 style={{

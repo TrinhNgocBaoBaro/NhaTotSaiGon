@@ -318,7 +318,7 @@ export default function App() {
           <Stack.Screen name="CreateAppointment" component={CreateAppointmentScreen} />
           <Stack.Screen name="DoneAppointment" component={DoneAppointmentScreen} />
           <Stack.Screen name="CreatePost" component={CreatePostScreen} />
-          <Stack.Screen name="Favourite" component={FavouriteScreen} />
+          <Stack.Screen name="Favourite" component={FavouriteScreen} initialParams={{user_id: userId}}/>
           <Stack.Screen name="ListPost" component={ListPostScreen} initialParams={{user_id: userId}} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           </>

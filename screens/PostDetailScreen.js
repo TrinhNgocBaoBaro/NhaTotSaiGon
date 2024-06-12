@@ -35,6 +35,7 @@ const PostDetailScreen = ({ navigation, route }) => {
   const [showModalProfile, setShowModalProfile] = React.useState(false);
 
   const [isLoading, setIsLoading] = React.useState(true);
+  const [isFavourite, setIsFavourite] = React.useState(null);
   const [comment, setComment] = React.useState();
   const [aboutMe, setAboutMe] = React.useState(null);
   const [profile, setProfile] = React.useState(null);
@@ -50,17 +51,24 @@ const PostDetailScreen = ({ navigation, route }) => {
     } catch (error) {
       console.log(error);
     } finally {
-      setTimeout(setLoad, 1000)
+      setTimeout(setLoad, 500)
     }
   };
 
   const fetchDataAboutMe = async () => {
     try {
-      const data = await getDataAboutMe();
-      setAboutMe(data);
+      const response = await API.get(`/account/${user_id}`);
+      if (response) {
+        setAboutMe(response.data);
+      }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.log(error);
     }
+  };
+
+  const checkFavourite = async () => {
+      const isFavourite = aboutMe.favorite_post.includes(post_id);
+      setIsFavourite(isFavourite);
   };
 
   const createComment = async () => {
@@ -103,32 +111,45 @@ const PostDetailScreen = ({ navigation, route }) => {
 
     const createFavourite = async () => {
     try {
-      const response = await API.post(`/favorite-post/`,
+      const response = await API.post(`/account/favorite-post/${user_id}`,
         {
-          renter_id: user_id,
-          post_id: post_id,
-          image_url: postDetails.images[0],
-          address: postDetails.address,
-          area: postDetails.area
+          push_id: post_id
         });
       if (response) {
-        // setComment();
-        // setShowModalComment(!showModalComment);
-        console.log("Success")
+        console.log("Success favourite!")
+        setIsFavourite(true)
       }
     } catch (error) {
       console.log(error);
-    } finally {
-      // fetchPostDetails()
-    }
+    } 
+  };
+
+  const deleteFavourite = async () => {
+    try {
+      const response = await API.put(`/account/favorite-post/${user_id}`,
+        {
+          pull_id: post_id
+        });
+      if (response) {
+        console.log("Success delete favourite!")
+        setIsFavourite(false)
+      }
+    } catch (error) {
+      console.log(error);
+    } 
   };
 
   const setLoad = () => setIsLoading(false);
 
+  
   React.useEffect(() => {
-    fetchDataAboutMe();
+    if(user_id) fetchDataAboutMe();
     if(post_id) fetchPostDetails();    
   }, []);
+
+  React.useEffect(() => {
+    if(aboutMe && post_id) checkFavourite();
+  }, [aboutMe, post_id]);
 
 
 
@@ -195,7 +216,7 @@ const PostDetailScreen = ({ navigation, route }) => {
               <Icon name="arrow-back-outline" size={28} color={COLORS.orange} />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.5} onPress={createFavourite}>
+          <TouchableOpacity activeOpacity={0.5} onPress={isFavourite ? deleteFavourite : createFavourite}>
             <View
               style={{
                 height: 50,
@@ -207,7 +228,7 @@ const PostDetailScreen = ({ navigation, route }) => {
                 borderRadius: 50,
               }}
             >
-              <Icon name={"heart-outline"} size={25} color={COLORS.orange} />
+              <Icon name={isFavourite ? "heart" : "heart-outline"} size={25} color={COLORS.orange} />
             </View>
           </TouchableOpacity>
         </View>
@@ -222,7 +243,7 @@ const PostDetailScreen = ({ navigation, route }) => {
             marginBottom: 120,
           }}
         >
-          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }}>
+          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }} onPress={checkFavourite}>
             {postDetails.title}.
           </Text>
 

@@ -5,6 +5,11 @@ import COLORS from "../constants/color";
 import FONTS from "../constants/font";
 import Icon from "react-native-vector-icons/Ionicons";
 import LoadingModal from "../components/LoadingModal";
+import { formatCurrency } from "../utils";
+import { useIsFocused } from "@react-navigation/native";
+
+import createAxios from "../utils/axios";
+const API = createAxios();
 
 const favouriteList = [
   {
@@ -79,7 +84,47 @@ const favouriteList = [
   },
 ];
 
-const FavouriteScreen = ({ navigation }) => {
+const FavouriteScreen = ({ navigation, route }) => {
+
+  const { user_id } = route.params
+  const isFocused = useIsFocused();
+
+  const [dataFavouritePost, setDataFavouritePost] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  const fetchFavouritePost = async () => {
+    try {
+      const response = await API.get(`/account/favorite-post/${user_id}`);
+      if (response) {
+        setDataFavouritePost(response.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false)
+    }
+  };
+
+  const deleteFavourite = async (post_id) => {
+    try {
+      const response = await API.put(`/account/favorite-post/${user_id}`,
+        {
+          pull_id: post_id
+        });
+      if (response) {
+        console.log("Success delete favourite!")
+        fetchFavouritePost();
+      }
+    } catch (error) {
+      console.log(error);
+    } 
+  };
+
+  React.useEffect(() => {
+    if(user_id) fetchFavouritePost()
+  }, [isFocused])
+  
+
   return (
     <>
       <Header
@@ -89,13 +134,19 @@ const FavouriteScreen = ({ navigation }) => {
         rightIcon="heart"
         onPress={() => navigation.goBack()}
       />
+      {dataFavouritePost.length === 0 ?
+      <View style={{flex: 1, backgroundColor: COLORS.white, alignItems: 'center',justifyContent: 'center', paddingBottom: 80}}>
+          <Icon name="heart-dislike-outline" size={100} color={COLORS.darkGrey}/>
+          <Text style={{fontFamily: FONTS.semiBold, color: COLORS.lightGrey, fontSize: 15, marginTop: 10,}}>Không có bài đăng yêu thích.</Text>
+      </View>
+      :
       <FlatList
         showsVerticalScrollIndicator={false}
-        data={favouriteList}
+        data={dataFavouritePost}
         renderItem={({item, index}) =>
             (
                 <TouchableOpacity
-                onPress={() => {navigation.navigate("PostDetail")}}
+                onPress={() => {navigation.navigate("PostDetail", {post_id: item._id})}}
                 activeOpacity={0.8}
                 style={
                   {
@@ -111,8 +162,8 @@ const FavouriteScreen = ({ navigation }) => {
                 }
               >
                 <Image
-                  source={{ uri: item.image }}
-                  style={{ height: 100, width: 100, borderRadius: 5 }}
+                  source={{ uri: item.images[0] }}
+                  style={{ height: 100, width: 120, borderRadius: 5 }}
                 />
                 <View
                   style={{
@@ -128,22 +179,33 @@ const FavouriteScreen = ({ navigation }) => {
                   <Text
                     style={{
                       fontFamily: FONTS.semiBold,
-                      fontSize: 12,
+                      fontSize: 13,
                       color: COLORS.grey,
                       marginTop: 5
                     }}
                   >
-                    Diện tích: {item.time} m²
+                    Diện tích: {item.area} m²
                   </Text>
+                  <Text
+                      style={{
+                        fontFamily: FONTS.semiBold,
+                        fontSize: 14,
+                        color: COLORS.orange,
+                        marginTop: 5,
+                      }}
+                    >
+                      {formatCurrency(item.price)} / 1 tháng
+                    </Text>
                 </View>
-                <Icon onPress={()=>{console.log("haha")}} name="trash-outline" color={COLORS.orange} size={24} style={{alignSelf: 'center'}}/> 
+                <Icon onPress={()=>{deleteFavourite(item._id)}} name="trash-outline" color={COLORS.orange} size={24} style={{alignSelf: 'flex-end'}}/> 
               </TouchableOpacity>
             )
         }
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         style={{backgroundColor: COLORS.white}}
       />
-      {/* <LoadingModal modalVisible={true}/> */}
+      }
+      <LoadingModal modalVisible={isLoading}/>
 
     </>
   );
