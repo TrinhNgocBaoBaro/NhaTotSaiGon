@@ -17,7 +17,7 @@ const DoneAppointmentScreen = ({navigation}) => {
         <Text style={{fontFamily: FONTS.semiBold, fontSize: 20, marginBottom: 50}}>Đặt lịch hẹn thành công!</Text>
         <ButtonFlex
             title="Quay lại trang chủ"
-            onPress={() => navigation.navigate("Home")}
+            onPress={() => navigation.navigate("Lịch hẹn")}
             stylesButton={{ paddingVertical: 10, paddingHorizontal: 90 }}
             stylesText={{ fontSize: 15 }}
           />

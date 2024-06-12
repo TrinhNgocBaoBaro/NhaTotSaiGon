@@ -181,6 +181,7 @@ const TabRoute = ({ userId }) => {
       <Tab.Screen
         name="Lịch hẹn"
         component={AppointmentScreen}
+        initialParams={{userId}}
         options={{
           tabBarIcon: ({ focused, color, size }) => {
             return focused ? (

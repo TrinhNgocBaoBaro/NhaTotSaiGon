@@ -14,6 +14,11 @@ import FONTS from "../constants/font";
 import Icon from "react-native-vector-icons/Ionicons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { ButtonFloatBottom } from "../components/Button";
+import { moment } from "../utils";
+import createAxios from "../utils/axios";
+import LoadingModal from "../components/LoadingModal";
+
+const API = createAxios();
 
 const time = [
   {
@@ -102,10 +107,29 @@ const time = [
   },
 ];
 
-const CreateAppointmentScreen = ({ navigation }) => {
+const CreateAppointmentScreen = ({ navigation, route }) => {
+
+  const {postDetails, aboutMe} = route.params
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const [isDatePickerVisible, setDatePickerVisibility] = React.useState(false);
   const [datePicked, setDatePicked] = React.useState(null);
   const [timePicked, setTimePicked] = React.useState();
+  const [renterName, setRenterName] = React.useState();
+  const [renterPhone, setRenterPhone] = React.useState();
+  const [renterNote, setRenterNote] = React.useState();
+
+  React.useEffect(() => {
+    console.log("aboutMe: ", aboutMe)
+  }, [aboutMe])
+
+  React.useEffect(() => {
+    if(aboutMe) {
+      setRenterName(aboutMe.name);
+      setRenterPhone(aboutMe.phone);
+    }
+  }, [aboutMe]);
+  
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -116,10 +140,42 @@ const CreateAppointmentScreen = ({ navigation }) => {
   };
 
   const handleConfirm = (date) => {
-    console.log("A date has been picked: ", date);
-    setDatePicked(date);
+    setDatePicked(moment(date).format("yyyy-MM-DD"));
     hideDatePicker();
   };
+
+  const createAppointment = async () => {
+    setIsLoading(true)
+    try {
+      const response = await API.post(`/book-schedules/`,
+        {
+          post_id: postDetails._id,
+          renter_id: aboutMe._id,
+          owner_id: postDetails.author.id,
+          address: postDetails.address,
+          image: postDetails.images[0],
+          price: postDetails.price,
+          area: postDetails.area,
+          owner_name: postDetails.author.name,
+          owner_phone: postDetails.phone,
+          renter_name: renterName.trim(),
+          renter_phone: renterPhone.trim(),
+          date: datePicked,
+          time: timePicked,
+          note: renterNote.trim(),
+          status: "pending",
+        });
+      if (response) {
+        setIsLoading(false)
+
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      navigation.navigate("DoneAppointment")
+    }
+  };
+  
 
   const showButtonConfirm = () =>
     Alert.alert('Xác nhận', 'Bạn có muốn hoàn tất đặt lịch hẹn?', [
@@ -128,15 +184,15 @@ const CreateAppointmentScreen = ({ navigation }) => {
         onPress: () => console.log('Cancel Pressed'),
         style: 'cancel',
       },
-      {text: 'OK', onPress: () => navigation.navigate("DoneAppointment")},
+      {text: 'OK', onPress: () => createAppointment()},
     ]);
 
-  function formatDatePicked(datePicked) {
-    const day = datePicked.getDate();
-    const month = datePicked.getMonth() + 1; 
-    const year = datePicked.getFullYear();
-    return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
-}
+//   function formatDatePicked(datePicked) {
+//     const day = datePicked.getDate();
+//     const month = datePicked.getMonth() + 1; 
+//     const year = datePicked.getFullYear();
+//     return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+// }
   return (
     <>
       <Header
@@ -164,6 +220,8 @@ const CreateAppointmentScreen = ({ navigation }) => {
                 flex: 1,
               }}
               placeholder="Nhập họ và tên"
+              onChangeText={(txt) => setRenterName(txt)}
+              value={renterName}
             />
           </View>
         </View>
@@ -185,8 +243,8 @@ const CreateAppointmentScreen = ({ navigation }) => {
               placeholder="Nhập số điện thoại"
               inputMode="numeric"
               keyboardType="numeric"
-            //   onChangeText={(newTextPhone) => setPhone(newTextPhone)}
-
+              onChangeText={(txt) => setRenterPhone(txt)}
+              value={renterPhone}
             />
           </View>
         </View>
@@ -259,7 +317,7 @@ const CreateAppointmentScreen = ({ navigation }) => {
                 fontSize: 16,
               }}
             >
-              {datePicked ? formatDatePicked(datePicked) : "_ _ / _ _ / _ _ _ _"}
+              {datePicked ? moment(datePicked).format("DD/MM/yyyy") : "_ _ / _ _ / _ _ _ _"}
             </Text>
           </TouchableOpacity>
           <DateTimePickerModal
@@ -291,14 +349,17 @@ const CreateAppointmentScreen = ({ navigation }) => {
               multiline
               maxLength={150}
               numberOfLines={3}
-            //   onChangeText={(newTextPhone) => setPhone(newTextPhone)}
+              onChangeText={(txt) => setRenterNote(txt)}
 
             />
           </View>
         </View>
         </View>
       </ScrollView>
-      <ButtonFloatBottom title={"Xác nhận"} buttonColor={COLORS.orange} onPress={showButtonConfirm}/>
+      <ButtonFloatBottom title={"Xác nhận"} 
+                         buttonColor={renterName && (renterPhone) && timePicked && datePicked ? COLORS.orange : COLORS.grey} 
+                         onPress={()=> renterName && (renterPhone) && timePicked && datePicked ? showButtonConfirm() : {}}/>
+      <LoadingModal modalVisible={isLoading}/>
     </>
   );
 };

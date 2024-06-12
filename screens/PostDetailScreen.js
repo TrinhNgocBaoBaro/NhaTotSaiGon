@@ -259,7 +259,7 @@ const PostDetailScreen = ({ navigation, route }) => {
                 flexShrink: 1,
               }}
             >
-              0123456789
+              {postDetails.phone}
             </Text>
           </View>
           <View style={{ flexDirection: "row", marginTop: 10 }}>
@@ -305,14 +305,19 @@ const PostDetailScreen = ({ navigation, route }) => {
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 14, marginTop: 10, alignSelf: 'flex-end' }}>           
           {moment(postDetails.time_created).fromNow()}
           </Text>
-          <View style={{ flexDirection: "row", marginTop: 20 }}>
+          <TouchableOpacity 
+          onPress={()=>fetchDataProfile(postDetails.author.id)}
+          activeOpacity={0.5}
+          style={{ flexDirection: "row", marginTop: 20 }}>
             <Image
               source={{
                 uri: postDetails.author.image || "https://scontent.fsgn15-1.fna.fbcdn.net/v/t39.30808-1/438238559_1143642673426668_6656372791733229549_n.jpg?stp=c2.0.200.200a_dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=-2s72PAG7cEQ7kNvgEXAYaA&_nc_ht=scontent.fsgn15-1.fna&oh=00_AYAE6pxdrTkzfxHAGoHxzJfSAVLf9yEAF-BEkZqeKL7DBw&oe=6660C602",
               }}
               style={{ height: 50, width: 50, borderRadius: 50 }}
             />
-            <View style={{ marginLeft: 10 }}>
+            <View 
+              style={{ marginLeft: 10 }}
+              >
               <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }}>
                 {postDetails.author.name}
               </Text>
@@ -320,7 +325,7 @@ const PostDetailScreen = ({ navigation, route }) => {
                 Người đăng tin
               </Text>
             </View>
-          </View>
+          </TouchableOpacity>
 
           <View style={{ marginTop: 30 }}>
             <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }}>
@@ -338,7 +343,7 @@ const PostDetailScreen = ({ navigation, route }) => {
                 }}
                 style={{ height: 35, width: 35, borderRadius: 50,borderWidth: !comment.is_private ? 1:0, borderColor: COLORS.orange }}
               />
-              <View style={{ marginLeft: 15, height: "auto", maxWidth: "85%" }}>
+              <View style={{ marginLeft: 15, height: "auto", marginRight: 20, flex: 1,alignItems: 'flex-start',}}>
                 <Text
                   style={{
                     fontFamily: FONTS.semiBold,
@@ -378,7 +383,8 @@ const PostDetailScreen = ({ navigation, route }) => {
                 borderRadius: 50, padding: 20, alignSelf: 'flex-end', elevation: 5}}>
         <Icon name="chatbox-ellipses" color={COLORS.white} size={30}/>
       </TouchableOpacity>
-      <ButtonFloatBottom title="Đặt lịch hẹn" buttonColor={COLORS.orange} onPress={()=>navigation.navigate("CreateAppointment")}/>
+      {postDetails.author.id !== user_id &&
+      <ButtonFloatBottom title="Đặt lịch hẹn" buttonColor={COLORS.orange} onPress={()=>navigation.navigate("CreateAppointment", {postDetails, aboutMe})}/> }
       <Modal isVisible={showModalComment} 
              onBackdropPress={()=> setShowModalComment(!showModalComment)}
              animationOutTiming={300}
