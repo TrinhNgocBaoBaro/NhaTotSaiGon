@@ -162,7 +162,7 @@ const CreateAppointmentScreen = ({ navigation, route }) => {
           renter_phone: renterPhone.trim(),
           date: datePicked,
           time: timePicked,
-          note: renterNote.trim(),
+          note: renterNote ? renterNote.trim() : "",
           status: "pending",
         });
       if (response) {

@@ -76,8 +76,8 @@ const HomeScreen = ({ navigation }) => {
       setIsLoading(false);
     }
   };
-  fetchDataHome();
-  }, []);
+  if(isFocused === true) fetchDataHome();
+  }, [isFocused]);
 
 
   if (isLoading && !avatar) {
@@ -132,7 +132,7 @@ const HomeScreen = ({ navigation }) => {
                 justifyContent: "center",
               }}
             >
-              <Icon name={"heart-outline"} size={40} color={"orange"} />
+              <Icon name={"heart-outline"} size={40} color={COLORS.orange} />
             </View>
           </TouchableOpacity>
           <View style={{justifyContent: "center" }}>
@@ -145,7 +145,7 @@ const HomeScreen = ({ navigation }) => {
                 justifyContent: "center",
               }}
             >
-              <Icon name={"newspaper"} size={35} color={"orange"} />
+              <Icon name={"newspaper"} size={35} color={COLORS.orange} />
             </View>
           </TouchableOpacity>
           </View>

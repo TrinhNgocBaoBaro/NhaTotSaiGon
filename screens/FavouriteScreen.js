@@ -135,10 +135,13 @@ const FavouriteScreen = ({ navigation, route }) => {
         onPress={() => navigation.goBack()}
       />
       {dataFavouritePost.length === 0 ?
+      (isLoading ?
+      <View></View>
+      :
       <View style={{flex: 1, backgroundColor: COLORS.white, alignItems: 'center',justifyContent: 'center', paddingBottom: 80}}>
           <Icon name="heart-dislike-outline" size={100} color={COLORS.darkGrey}/>
           <Text style={{fontFamily: FONTS.semiBold, color: COLORS.lightGrey, fontSize: 15, marginTop: 10,}}>Không có bài đăng yêu thích.</Text>
-      </View>
+      </View>)
       :
       <FlatList
         showsVerticalScrollIndicator={false}

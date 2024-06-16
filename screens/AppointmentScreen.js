@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   Image,
+  Alert
 } from "react-native";
 import React from "react";
 import Header from "../components/Header";
@@ -159,7 +160,7 @@ const AppointmentScreen = ({navigation, route}) => {
     switch (currentTabView) {
       case 1:
         try {
-          const response = await API.get(`/book-schedules/`);
+          const response = await API.get(`/book-schedules/?renter_id=${userId}`);
           if (response) {
             console.log(response.data)
             setDataYourAppointment(response.data);
@@ -172,7 +173,7 @@ const AppointmentScreen = ({navigation, route}) => {
         break;
       case 2:
         try {
-          const response = await API.get(`/book-schedules/`);
+          const response = await API.get(`/book-schedules/?owner_id=${userId}`);
           if (response) {
             console.log(response.data)
             setDataGuestAppointment(response.data);
@@ -191,7 +192,33 @@ const AppointmentScreen = ({navigation, route}) => {
 
   };
 
+  const confirmAppointment = async (schedule_id) => {
+    setIsLoading(true)
+    try {
+      const response = await API.put(`/book-schedules/${schedule_id}`,
+        {
+          status: "confirmed",
+        });
+      if (response) {
+        console.log("Success confirm!")
+        fetchAppointment();
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false)
+    }
+  };
 
+  const showButtonConfirm = (schedule_id) =>
+    Alert.alert('Xác nhận', 'Bạn có muốn xác nhận lịch hẹn?', [
+      {
+        text: 'Hủy',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {text: 'OK', onPress: ()=> {confirmAppointment(schedule_id)}},
+    ]);
   
 
   React.useEffect(() => {
@@ -605,15 +632,17 @@ const AppointmentScreen = ({navigation, route}) => {
                 <ButtonFlex
                   title="Xem bài đăng"
                   onPress={() => navigation.navigate("PostDetail",{post_id: item.post_id})}
-                  stylesButton={{ paddingVertical: 8 ,backgroundColor: COLORS.white, borderWidth: 2, borderColor: COLORS.orange, marginRight: 10, }}
+                  stylesButton={{ paddingVertical: 8 ,backgroundColor: COLORS.white, borderWidth: 2, borderColor: COLORS.orange,  }}
                   stylesText={{ fontSize: 13, color: COLORS.orange }}
                 />
+                {item.status === 'pending' &&  
                 <ButtonFlex
                   title="Xác nhận"
-                  onPress={() => {}}
-                  stylesButton={{ paddingVertical: 8 ,backgroundColor: COLORS.white, borderWidth: 2, borderColor: COLORS.orange }}
+                  onPress={() => showButtonConfirm(item._id)}
+                  stylesButton={{ paddingVertical: 8 ,backgroundColor: COLORS.white, borderWidth: 2, borderColor: COLORS.orange, marginLeft: 10, }}
                   stylesText={{ fontSize: 13, color: COLORS.orange }}
                 />
+                }
                 </View>
               </View>
             </View>

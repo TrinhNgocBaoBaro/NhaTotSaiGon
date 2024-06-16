@@ -151,7 +151,13 @@ const CreatePostScreen = ({navigation}) => {
                 });
               });
 
-              formCreatePost.append("author", "6663bb8c8197429ea3b28182");
+              const author = {
+                id: aboutMe._id,
+                image: aboutMe.image,
+                name: aboutMe.name
+            };
+
+              formCreatePost.append("author", JSON.stringify(author));
               formCreatePost.append("title", title);
               formCreatePost.append("description", description);
               formCreatePost.append("utilities", utilities);
@@ -223,7 +229,7 @@ const CreatePostScreen = ({navigation}) => {
             } else {
               // Alert.alert('Success', 'Your payment was successful!');
               createPost();
-              navigation.navigate("ListPost")
+              navigation.navigate("Trang chủ")
             }
           };
 

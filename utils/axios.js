@@ -46,6 +46,15 @@ const createAxios = () => {
     }
   };
 
+  const getWithQuery = async (endpoint, query) => {
+    try {
+      const response = await api.get(endpoint, { params: query });
+      return response.data;
+    } catch (error) {
+      throw new Error(`GET request to ${endpoint} with query ${JSON.stringify(query)} failed: ${error.message}`);
+    }
+  };
+
   const post = (endpoint, data) => {
     return api
       .post(endpoint, data)
@@ -95,6 +104,7 @@ const createAxios = () => {
   return {
     get,
     getWithData,
+    getWithQuery,
     post,
     postWithHeaders,
     put,
