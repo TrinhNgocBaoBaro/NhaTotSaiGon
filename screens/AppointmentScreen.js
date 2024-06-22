@@ -153,6 +153,7 @@ const AppointmentScreen = ({navigation, route}) => {
   const statusAppointment = {
     pending: { color: COLORS.blue, text: "Chờ xác nhận" },
     confirmed: { color: COLORS.green, text: "Đã xác nhận" },
+    cancelled: { color: COLORS.red, text: "Đã hủy" },
   };
 
   const fetchAppointment = async () => {
@@ -210,6 +211,24 @@ const AppointmentScreen = ({navigation, route}) => {
     }
   };
 
+  const cancelAppointment = async (schedule_id) => {
+    setIsLoading(true)
+    try {
+      const response = await API.put(`/book-schedules/${schedule_id}`,
+        {
+          status: "cancelled",
+        });
+      if (response) {
+        console.log("Success cancelled!")
+        fetchAppointment();
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false)
+    }
+  };
+
   const showButtonConfirm = (schedule_id) =>
     Alert.alert('Xác nhận', 'Bạn có muốn xác nhận lịch hẹn?', [
       {
@@ -219,6 +238,16 @@ const AppointmentScreen = ({navigation, route}) => {
       },
       {text: 'OK', onPress: ()=> {confirmAppointment(schedule_id)}},
     ]);
+
+    const showButtonCancel = (schedule_id) =>
+      Alert.alert('Xác nhận', 'Bạn có muốn hủy lịch hẹn?', [
+        {
+          text: 'Hủy',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: ()=> {cancelAppointment(schedule_id)}},
+      ]);
   
 
   React.useEffect(() => {
@@ -436,12 +465,14 @@ const AppointmentScreen = ({navigation, route}) => {
                     </Text>
                 </View>
                 <View style={{marginTop: 10, flex: 1, alignItems: 'flex-end',flexDirection: 'row', justifyContent: 'flex-end'}}>
+                {item.status === 'pending' &&  
                 <ButtonFlex
                   title="Hủy"
-                  onPress={() => {}}
+                  onPress={()=>showButtonCancel(item._id)}
                   stylesButton={{ paddingVertical: 8 ,backgroundColor: COLORS.white, borderWidth: 0, borderColor: COLORS.orange }}
                   stylesText={{ fontSize: 13, color: COLORS.red }}
                 />
+                }
                 <ButtonFlex
                   title="Xem bài đăng"
                   onPress={() => navigation.navigate("PostDetail",{post_id: item.post_id})}
@@ -635,7 +666,7 @@ const AppointmentScreen = ({navigation, route}) => {
                   stylesButton={{ paddingVertical: 8 ,backgroundColor: COLORS.white, borderWidth: 2, borderColor: COLORS.orange,  }}
                   stylesText={{ fontSize: 13, color: COLORS.orange }}
                 />
-                {item.status === 'pending' &&  
+                {item.status === 'pending' && 
                 <ButtonFlex
                   title="Xác nhận"
                   onPress={() => showButtonConfirm(item._id)}

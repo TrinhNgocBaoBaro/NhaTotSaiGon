@@ -27,13 +27,15 @@ import COLORS from "../constants/color";
 import LoadingModal from "../components/LoadingModal";
 const API = createAxios();
 import AuthContext from "../context/AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileScreen = ({ navigation }) => {
   const [aboutMe, setAboutMe] = React.useState(null);
   const [showStationInfo, setShowStationInfo] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
-  const { signInWithGoogle, signOut } = useContext(AuthContext);
+  const { signOut } = useContext(AuthContext);
   const [refreshing, setRefreshing] = React.useState(false);
+  const [isPrivate, setIsPrivate] = React.useState(aboutMe && aboutMe.is_private);
 
   // const getDataAboutMe = async () => {
   //   try {
@@ -70,6 +72,26 @@ const ProfileScreen = ({ navigation }) => {
       console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const updatePrivate = async () => {
+    try {
+      const response = await API.put(`/account/${aboutMe._id}`,
+        {
+          is_private : !aboutMe.is_private
+        }
+      );
+      if (response) {
+        console.log("Success updatePrivate");
+        AsyncStorage.setItem('UserLoggedInData', JSON.stringify(response.data));
+        setAboutMe(prevState => ({
+          ...prevState,
+          is_private: !prevState.is_private
+        }));
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -237,7 +259,7 @@ const ProfileScreen = ({ navigation }) => {
                       {"Quyền riêng tư"}
                     </Text>
                     <View style={{ alignSelf: "flex-end" }}>
-                      <View>
+                      <TouchableOpacity onPress={updatePrivate}>
                         <Icon1
                           name={aboutMe && aboutMe.is_private ? "toggle-on": "toggle-off"}
                           size={24}
@@ -247,7 +269,7 @@ const ProfileScreen = ({ navigation }) => {
                             fontSize: 24,
                           }}
                         />
-                      </View>
+                      </TouchableOpacity>
                     </View>
                   </TouchableOpacity>
                   <TouchableOpacity

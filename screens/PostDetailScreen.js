@@ -18,6 +18,8 @@ import { ButtonFlex, ButtonFloatBottom } from "../components/Button";
 import Modal from "react-native-modal";
 import { formatCurrency, moment } from "../utils";
 import LoadingModal from "../components/LoadingModal";
+import ContentModal from "../components/ContentModal";
+
 import { getDataAboutMe } from "../utils/api";
 import createAxios from "../utils/axios";
 const API = createAxios();
@@ -553,6 +555,7 @@ const PostDetailScreen = ({ navigation, route }) => {
       </>
       }
 
+      <ContentModal modalVisible={isLoading === false && postDetails && postDetails.is_active === "false"} title={"Đã xóa"} onPress={()=>navigation.goBack()}/>
       <LoadingModal modalVisible={isLoading}/>
     </>
   );
