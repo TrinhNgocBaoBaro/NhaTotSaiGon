@@ -5,9 +5,11 @@ import {
   TouchableOpacity,
   View,
   Image,
-  Alert
+  Alert, 
+  TextInput,
+  ScrollView
 } from "react-native";
-import React from "react";
+import React, { useCallback, useMemo, useRef} from "react";
 import Header from "../components/Header";
 import COLORS from "../constants/color";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -16,103 +18,12 @@ import { formatCurrency, moment } from "../utils";
 import { ButtonFlex } from '../components/Button'
 import LoadingModal from "../components/LoadingModal";
 import { useIsFocused } from "@react-navigation/native";
+import Modal from "react-native-modal";
+import BottomSheet, { BottomSheetView, BottomSheetBackdrop, BottomSheetScrollView  }  from '@gorhom/bottom-sheet';
 
 import createAxios from "../utils/axios";
 const API = createAxios();
 
-const dataAppointment = [
-  {
-    id: 1,
-    address: "48 Đường Nguyễn Văn Mai, Phường 8, Quận 3, TP. Hồ Chí Minh",
-    image:
-      "https://firebasestorage.googleapis.com/v0/b/fir-auth-uicha.appspot.com/o/b68ef200-29d7-4192-8be4-c4b66844ad99?alt=media",
-    price: "2700000",
-    area: "20",
-    name: "Lê Hữu Nguyễn",
-    phone: "0123456789",
-    time: "08:00",
-    date: "2024-06-12", //yyyy-MM-dd
-    post_id: "2312sfsafsdvsdnm3n4324",
-    renter_id: "6663e6db8197429ea3b28183",
-    owner_id: "6660807eac641bc87d297c7b",
-    renter_phone: "0789789798",
-    note: 'Em ra đợi trước chung cư anh đợi em  ở đó nha',
-    status: 'pending'
-  },
-  {
-    id: 2,
-    address:
-      "48 Đường Nguyễn Văn Mai, Phường 8, Quận 3, TP. Hồ Chí Minh, Việt Nam - Trái Đất",
-    image:
-      "https://firebasestorage.googleapis.com/v0/b/fir-auth-uicha.appspot.com/o/b68ef200-29d7-4192-8be4-c4b66844ad99?alt=media",
-    price: "2700000",
-    area: "20",
-    name: "Lê Hữu Nguyễn",
-    phone: "0123456789",
-    time: "08:00",
-    date: "2024-06-12", //yyyy-MM-dd
-    post_id: "2312sfsafsdvsdnm3n4324",
-    renter_id: "6663e6db8197429ea3b28183",
-    owner_id: "6660807eac641bc87d297c7b",
-    renter_phone: "0789789798",
-    note: 'Em ra đợi trước chung cư anh đợi em  ở đó nha',
-    status: 'confirmed'
-  },
-  {
-    id: 3,
-    address: "48 Đường Nguyễn Văn Mai, Phường 8, Quận 3",
-    image:
-      "https://firebasestorage.googleapis.com/v0/b/fir-auth-uicha.appspot.com/o/b68ef200-29d7-4192-8be4-c4b66844ad99?alt=media",
-    price: "2700000",
-    area: "20",
-    name: "Lê Hữu Nguyễn",
-    phone: "0123456789",
-    time: "08:00",
-    date: "2024-06-12", //yyyy-MM-dd
-    post_id: "2312sfsafsdvsdnm3n4324",
-    renter_id: "6663e6db8197429ea3b28183",
-    owner_id: "6660807eac641bc87d297c7b",
-    renter_phone: "0789789798",
-    note: 'Em ra đợi trước chung cư anh đợi em  ở đó nha',
-    status: 'pending'
-  },
-  {
-    id: 4,
-    address: "48 Đường Nguyễn Văn Mai, Phường 8, Quận 3",
-    image:
-      "https://firebasestorage.googleapis.com/v0/b/fir-auth-uicha.appspot.com/o/b68ef200-29d7-4192-8be4-c4b66844ad99?alt=media",
-    price: "2700000",
-    area: "20",
-    name: "Lê Hữu Nguyễn",
-    phone: "0123456789",
-    time: "08:00",
-    date: "2024-06-12", //yyyy-MM-dd
-    post_id: "2312sfsafsdvsdnm3n4324",
-    renter_id: "6663e6db8197429ea3b28183",
-    owner_id: "6660807eac641bc87d297c7b",
-    renter_phone: "0789789798",
-    note: 'Em ra đợi trước chung cư anh đợi em  ở đó nha',
-    status: 'pending'
-  },
-  {
-    id: 5,
-    address: "48 Đường Nguyễn Văn Mai, Phường 8, Quận 3",
-    image:
-      "https://firebasestorage.googleapis.com/v0/b/fir-auth-uicha.appspot.com/o/b68ef200-29d7-4192-8be4-c4b66844ad99?alt=media",
-    price: "2700000",
-    area: "20",
-    name: "Lê Hữu Nguyễn",
-    phone: "0123456789",
-    time: "08:00",
-    date: "2024-06-12", //yyyy-MM-dd
-    post_id: "2312sfsafsdvsdnm3n4324",
-    renter_id: "6663e6db8197429ea3b28183",
-    owner_id: "6660807eac641bc87d297c7b",
-    renter_phone: "0789789798",
-    note: 'Em ra đợi trước chung cư anh đợi em  ở đó nha',
-    status: 'confirmed'
-  },
-];
 
 const dataTabView = [
   {
@@ -127,16 +38,24 @@ const dataTabView = [
 
 const dataFilter = [
   {
-    id: 1,
+    id: "All",
     name: "Tất cả",
+    icon: "calendar-outline"
   },
   {
-    id: 2,
-    name: "Sắp tới",
-  },
-  {
-    id: 3,
+    id: "pending",
     name: "Chờ xác nhận",
+    icon: "ellipsis-horizontal-circle-outline"
+  },
+  {
+    id: "confirmed",
+    name: "Đã xác nhận",
+    icon: "checkbox-outline"
+  },
+  {
+    id: "cancelled",
+    name: "Đã hủy",
+    icon: "close-circle-outline"
   },
 ];
 
@@ -149,6 +68,35 @@ const AppointmentScreen = ({navigation, route}) => {
 
   const [dataYourAppointment, setDataYourAppointment] = React.useState([]);
   const [dataGuestAppointment, setDataGuestAppointment] = React.useState([]);
+  const [displayYourAppointment, setDisplayYourAppointment] = React.useState([]);
+
+  const [reasonCancel, setReasonCancel] = React.useState();
+  const [cancelScheduleId, setCancelScheduleId] = React.useState();
+
+  const [sortOld, setSortOld] = React.useState(false);
+  const [firstClickSort, setFirstClickSort] = React.useState(false);
+  const [filterStatus, setFilterStatus] = React.useState('All');
+
+  const bottomSheetRef = useRef();
+  const snapPoints = useMemo(() => ['50%'], []);
+  const handleClosePress = () => bottomSheetRef.current?.close();
+  const handleOpenPress = () => bottomSheetRef.current?.expand();
+  
+  const handleSheetChanges = useCallback((index) => {
+    console.log('handleSheetChanges', index);
+  }, []);
+
+  const renderBackdrop = useCallback(
+    props => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        onPress={handleClosePress}
+      />
+    ),
+    []
+  );
 
   const statusAppointment = {
     pending: { color: COLORS.blue, text: "Chờ xác nhận" },
@@ -158,13 +106,15 @@ const AppointmentScreen = ({navigation, route}) => {
 
   const fetchAppointment = async () => {
     setIsLoading(true)
+    setDisplayYourAppointment([])
     switch (currentTabView) {
       case 1:
         try {
           const response = await API.get(`/book-schedules/?renter_id=${userId}`);
           if (response) {
-            console.log(response.data)
-            setDataYourAppointment(response.data);
+            const arrayAfterSort = response.data.sort((a,b)=> b.time_created.localeCompare(a.time_created));
+            setDataYourAppointment(arrayAfterSort);
+            setDisplayYourAppointment(arrayAfterSort);
           }
         } catch (error) {
           console.log(error);
@@ -176,8 +126,9 @@ const AppointmentScreen = ({navigation, route}) => {
         try {
           const response = await API.get(`/book-schedules/?owner_id=${userId}`);
           if (response) {
-            console.log(response.data)
-            setDataGuestAppointment(response.data);
+            const arrayAfterSort = response.data.sort((a,b)=> b.time_created.localeCompare(a.time_created));
+            setDataGuestAppointment(arrayAfterSort);
+            setDisplayYourAppointment(arrayAfterSort);
           }
         } catch (error) {
           console.log(error);
@@ -211,16 +162,20 @@ const AppointmentScreen = ({navigation, route}) => {
     }
   };
 
-  const cancelAppointment = async (schedule_id) => {
+  const cancelAppointment = async () => {
     setIsLoading(true)
     try {
-      const response = await API.put(`/book-schedules/${schedule_id}`,
+      const response = await API.put(`/book-schedules/${cancelScheduleId}`,
         {
           status: "cancelled",
+          reason_cancel: reasonCancel.trim()
         });
       if (response) {
         console.log("Success cancelled!")
         fetchAppointment();
+        setReasonCancel()
+        setCancelScheduleId()
+        handleClosePress()
       }
     } catch (error) {
       console.log(error);
@@ -239,21 +194,41 @@ const AppointmentScreen = ({navigation, route}) => {
       {text: 'OK', onPress: ()=> {confirmAppointment(schedule_id)}},
     ]);
 
-    const showButtonCancel = (schedule_id) =>
-      Alert.alert('Xác nhận', 'Bạn có muốn hủy lịch hẹn?', [
-        {
-          text: 'Hủy',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {text: 'OK', onPress: ()=> {cancelAppointment(schedule_id)}},
-      ]);
   
+  const sortYourAppointmentList = (sortOld) => {
+      const arrayAfterSort = [...displayYourAppointment].sort((a,b)=> sortOld === true ? a.time_created.localeCompare(b.time_created) :  b.time_created.localeCompare(a.time_created));
+      setDisplayYourAppointment(arrayAfterSort)
+  }
+
+  const filterYourAppointmentList = (status) => {
+    if (status === 'All') {
+      setDisplayYourAppointment(currentTabView === 1 ? dataYourAppointment : dataGuestAppointment);
+    } else {
+      let arrayAfterFiltered;
+      currentTabView === 1 ?
+       arrayAfterFiltered = [...dataYourAppointment].filter(appointment => appointment.status === status)
+       :
+       arrayAfterFiltered = [...dataGuestAppointment].filter(appointment => appointment.status === status)
+      setDisplayYourAppointment(arrayAfterFiltered);
+    }
+  };
+
+  const handleFilterChange = (status) => {
+    setFilterStatus(status);
+    filterYourAppointmentList(status);
+    setFirstClickSort(false);
+    setSortOld(false);
+  };
 
   React.useEffect(() => {
-    // if(isFocused === true)
-       fetchAppointment()
-  }, [currentTabView])
+    if(isFocused === true) fetchAppointment(); setFilterStatus("All"); setFirstClickSort(false); setSortOld(false)
+  }, [currentTabView, isFocused])
+
+  React.useEffect(() => {
+    if(dataYourAppointment) {
+      sortYourAppointmentList(sortOld);
+    }
+}, [sortOld])
   
 
   return (
@@ -292,35 +267,56 @@ const AppointmentScreen = ({navigation, route}) => {
           </TouchableOpacity>
         ))}
       </View>
+      <View
+            style={{
+              alignItems: "flex-end",
+              justifyContent: "space-between",
+              backgroundColor: COLORS.white,
+              paddingHorizontal: 15,
+              paddingTop: 15
+            }}
+          >
+          <ScrollView contentContainerStyle={{alignItems: 'center', justifyContent: 'center'}} horizontal showsHorizontalScrollIndicator={false}>
+          {dataFilter.map((itemFilter,index)=>(
+          <TouchableOpacity
+          key={index}
+          activeOpacity={0.8}
+          style={{flexDirection: 'column', alignItems:'center', borderWidth: 0, borderColor: itemFilter.id === filterStatus ? COLORS.orange : COLORS.grey, borderRadius: 8, padding: 10, marginRight: 10}} 
+          onPress={()=>{handleFilterChange(itemFilter.id)}}>
+              <Icon name={itemFilter.icon} color={itemFilter.id === filterStatus ? COLORS.orange : COLORS.grey} size={30}/>
+              <Text style={{marginTop: 5, fontFamily: FONTS.semiBold, fontSize: 13, color: itemFilter.id === filterStatus ? COLORS.orange : COLORS.grey }}>
+                {itemFilter.name}
+              </Text>
+          </TouchableOpacity>
+            ))}
+          </ScrollView>
+      </View>
       {currentTabView === 1 && (
-        dataYourAppointment.length === 0 ?
+        displayYourAppointment.length === 0 ?
         (isLoading ?
           <View></View> 
           :
           <View style={{flex: 1, backgroundColor: COLORS.white, alignItems: 'center', justifyContent: 'center'}}>
             <Icon name="calendar-outline" color={COLORS.darkGrey} size={100}/>
-            <Text style={{fontFamily: FONTS.semiBold, fontSize: 18, color: COLORS.lightGrey, marginTop: 10,}}>Chưa có lịch hẹn.</Text>
+            <Text style={{fontFamily: FONTS.semiBold, fontSize: 18, color: COLORS.lightGrey, marginTop: 10,}}>Không có lịch hẹn.</Text>
           </View>
         )
 
         :
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={dataYourAppointment}
+          data={displayYourAppointment}
           ListHeaderComponent={
-            <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: 10
-            }}
-          >
-          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 18, color: COLORS.grey }}>Lọc</Text>
-          <TouchableOpacity onPress={()=>{}}>
-              <Icon name="options" color={COLORS.grey} size={23}/>
+            <TouchableOpacity 
+            activeOpacity={0.8}
+            style={{marginTop: 0,flexDirection: 'row', borderWidth: 0, borderColor: firstClickSort ? COLORS.orange : COLORS.grey, borderRadius: 50, padding: 10, backgroundColor: firstClickSort ? COLORS.white : COLORS.white, alignSelf: 'flex-end'}} 
+            onPress={() => {
+              setSortOld(!sortOld);
+              setFirstClickSort(true);
+            }}>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13,  color: firstClickSort ? COLORS.orange : COLORS.grey }}>{firstClickSort ? (sortOld ? "Cũ nhất" : "Mới nhất") : "Sắp xếp"} </Text>
+                <Icon name="swap-vertical" color={firstClickSort ? COLORS.orange : COLORS.grey} size={18}/>
             </TouchableOpacity>
-          </View>
           }
           renderItem={({ item, index }) => (
             <View
@@ -334,7 +330,7 @@ const AppointmentScreen = ({navigation, route}) => {
                 elevation: 2,
                 marginHorizontal: 5,
                 marginTop: index === 0 ? 5 : 0,
-                marginBottom: index === (dataYourAppointment.length - 1) ? 60: 10
+                marginBottom: index === (displayYourAppointment.length - 1) ? 60: 10
               }}
             >
               <View style={{ flexDirection: "row", }}>
@@ -447,7 +443,7 @@ const AppointmentScreen = ({navigation, route}) => {
                         lineHeight: 22
                       }}
                     >
-                      Ghi chú: {item.note !== "" ? item.note : "Không" }
+                      Ghi chú: {item.note !== "" ? item.note : "Không có" }
                     </Text>
                 </View>
                 <View style={{ flexDirection: "row", marginTop: 10, alignItems: 'center'}}>
@@ -464,20 +460,47 @@ const AppointmentScreen = ({navigation, route}) => {
                       {statusAppointment[item.status].text}
                     </Text>
                 </View>
+                {item.status === 'cancelled' &&
+                <View style={{ flexDirection: "row", marginTop: 10, alignItems: 'center'}}>
+                    <Text
+                      style={{
+                        fontFamily: FONTS.semiBold,
+                        marginLeft: 5,
+                        flexShrink: 1,
+                        fontSize: 13,
+                      }}
+                    >
+                      Lý do: {item.reason_cancel}
+                    </Text>
+                </View>
+                }
+                <View style={{ flexDirection: "column", marginTop: 10,  }}>
+                    <Text
+                      style={{
+                        fontFamily: FONTS.medium,
+                        marginLeft: 5,
+                        fontSize: 13,
+                        color: COLORS.grey
+                      }}
+                    >
+                      Đã tạo: {moment(item.time_created).fromNow()}
+                    </Text>
+                </View>
                 <View style={{marginTop: 10, flex: 1, alignItems: 'flex-end',flexDirection: 'row', justifyContent: 'flex-end'}}>
                 {item.status === 'pending' &&  
                 <ButtonFlex
                   title="Hủy"
-                  onPress={()=>showButtonCancel(item._id)}
+                  // onPress={()=>showButtonCancel(item._id)}
+                  onPress={()=>{setCancelScheduleId(item._id);handleOpenPress()}}
                   stylesButton={{ paddingVertical: 8 ,backgroundColor: COLORS.white, borderWidth: 0, borderColor: COLORS.orange }}
-                  stylesText={{ fontSize: 13, color: COLORS.red }}
+                  stylesText={{ fontSize: 13, color: COLORS.red, fontFamily: FONTS.semiBold,  }}
                 />
                 }
                 <ButtonFlex
                   title="Xem bài đăng"
                   onPress={() => navigation.navigate("PostDetail",{post_id: item.post_id})}
-                  stylesButton={{ paddingVertical: 8 ,backgroundColor: COLORS.white, borderWidth: 2, borderColor: COLORS.orange}}
-                  stylesText={{ fontSize: 13, color: COLORS.orange }}
+                  stylesButton={{ paddingVertical: 8 ,backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.orange}}
+                  stylesText={{ fontSize: 13, color: COLORS.orange, fontFamily: FONTS.semiBold, }}
                 />
                 </View>
               </View>
@@ -488,34 +511,31 @@ const AppointmentScreen = ({navigation, route}) => {
         />
       )}
       {currentTabView === 2 && (
-        dataGuestAppointment.length === 0 ?
+        displayYourAppointment.length === 0 ?
         (isLoading ?
           <View></View> 
           :
           <View style={{flex: 1, backgroundColor: COLORS.white, alignItems: 'center', justifyContent: 'center'}}>
             <Icon name="calendar-outline" color={COLORS.darkGrey} size={100}/>
-            <Text style={{fontFamily: FONTS.semiBold, fontSize: 18, color: COLORS.lightGrey, marginTop: 10,}}>Chưa có lịch hẹn.</Text>
+            <Text style={{fontFamily: FONTS.semiBold, fontSize: 18, color: COLORS.lightGrey, marginTop: 10,}}>Không có lịch hẹn.</Text>
           </View>
         )
 
         :
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={dataGuestAppointment}
+          data={displayYourAppointment}
           ListHeaderComponent={
-            <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: 10
-            }}
-          >
-          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 18, color: COLORS.grey }}>Lọc</Text>
-          <TouchableOpacity onPress={()=>{}}>
-              <Icon name="options" color={COLORS.grey} size={23}/>
+            <TouchableOpacity 
+            activeOpacity={0.8}
+            style={{marginTop: 0,flexDirection: 'row', borderWidth: 0, borderColor: firstClickSort ? COLORS.orange : COLORS.grey, borderRadius: 50, padding: 10, backgroundColor: firstClickSort ? COLORS.white : COLORS.white, alignSelf: 'flex-end'}} 
+            onPress={() => {
+              setSortOld(!sortOld);
+              setFirstClickSort(true);
+            }}>
+                <Text style={{ fontFamily: FONTS.semiBold, fontSize: 13,  color: firstClickSort ? COLORS.orange : COLORS.grey }}>{firstClickSort ? (sortOld ? "Cũ nhất" : "Mới nhất") : "Sắp xếp"} </Text>
+                <Icon name="swap-vertical" color={firstClickSort ? COLORS.orange : COLORS.grey} size={18}/>
             </TouchableOpacity>
-          </View>
           }
           renderItem={({ item, index }) => (
             <View
@@ -529,7 +549,7 @@ const AppointmentScreen = ({navigation, route}) => {
                 elevation: 2,
                 marginHorizontal: 5,
                 marginTop: index === 0 ? 5 : 0,
-                marginBottom: index === (dataYourAppointment.length - 1) ? 60: 10
+                marginBottom: index === (displayYourAppointment.length - 1) ? 60: 10
               }}
             >
               <View style={{ flexDirection: "row", }}>
@@ -642,7 +662,7 @@ const AppointmentScreen = ({navigation, route}) => {
                         lineHeight: 22
                       }}
                     >
-                      Ghi chú: {item.note !== "" ? item.note : "Không" }
+                      Ghi chú: {item.note !== "" ? item.note : "Không có" }
                     </Text>
                 </View>
                 <View style={{ flexDirection: "row", marginTop: 10, alignItems: 'center'}}>
@@ -659,19 +679,45 @@ const AppointmentScreen = ({navigation, route}) => {
                       {statusAppointment[item.status].text}
                     </Text>
                 </View>
+                {item.status === 'cancelled' &&
+                <View style={{ flexDirection: "row", marginTop: 10, alignItems: 'center'}}>
+                    <Text
+                      style={{
+                        fontFamily: FONTS.semiBold,
+                        marginLeft: 5,
+                        flexShrink: 1,
+                        fontSize: 13,
+                      }}
+                    >
+                      Lý do: {item.reason_cancel}
+                    </Text>
+                </View>
+                }
+                <View style={{ flexDirection: "column", marginTop: 10,  }}>
+                    <Text
+                      style={{
+                        fontFamily: FONTS.medium,
+                        marginLeft: 5,
+                        fontSize: 13,
+                        color: COLORS.grey
+                      }}
+                    >
+                      Thời gian tạo: {moment(item.time_created).fromNow()}
+                    </Text>
+                </View>
                 <View style={{marginTop: 10, flex: 1, alignItems: 'flex-end',flexDirection: 'row', justifyContent: 'flex-end'}}>
                 <ButtonFlex
                   title="Xem bài đăng"
                   onPress={() => navigation.navigate("PostDetail",{post_id: item.post_id})}
-                  stylesButton={{ paddingVertical: 8 ,backgroundColor: COLORS.white, borderWidth: 2, borderColor: COLORS.orange,  }}
-                  stylesText={{ fontSize: 13, color: COLORS.orange }}
+                  stylesButton={{ paddingVertical: 8 ,backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.orange,  }}
+                  stylesText={{ fontSize: 13, color: COLORS.orange, fontFamily: FONTS.semiBold,  }}
                 />
                 {item.status === 'pending' && 
                 <ButtonFlex
                   title="Xác nhận"
                   onPress={() => showButtonConfirm(item._id)}
-                  stylesButton={{ paddingVertical: 8 ,backgroundColor: COLORS.white, borderWidth: 2, borderColor: COLORS.orange, marginLeft: 10, }}
-                  stylesText={{ fontSize: 13, color: COLORS.orange }}
+                  stylesButton={{ paddingVertical: 8 ,backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.orange, marginLeft: 10, }}
+                  stylesText={{ fontSize: 13, color: COLORS.orange, fontFamily: FONTS.semiBold,  }}
                 />
                 }
                 </View>
@@ -682,7 +728,44 @@ const AppointmentScreen = ({navigation, route}) => {
           style={{ padding: 10, backgroundColor: COLORS.white }}
         />
       )}      
-                
+      <BottomSheet
+            ref={bottomSheetRef}
+            index={-1}
+            snapPoints={snapPoints}
+            onChange={handleSheetChanges}
+            enablePanDownToClose={true}
+            backdropComponent={renderBackdrop}
+      >
+      
+        <BottomSheetScrollView style={{width: 'auto', height: 'auto', backgroundColor: COLORS.white, borderRadius: 10, padding: 20,}}>
+          <Text style={{fontFamily: FONTS.semiBold, fontSize: 18, color: COLORS.black}}>Lý do hủy</Text>
+          <TextInput
+            style={{    
+              padding: 20,
+              fontSize: 16,
+              fontFamily: FONTS.medium,
+              backgroundColor: COLORS.greyPastel,
+              borderRadius: 10,
+              marginVertical: 20, 
+              minHeight: 100,
+              textAlignVertical: 'top'
+              }}
+            placeholder="Aa..."
+            maxLength={180}
+            multiline={true}
+            numberOfLines={5}
+            onChangeText={(txt)=>setReasonCancel(txt)}
+            value={reasonCancel}
+          />
+          <ButtonFlex title={"Xác nhận"}  
+                      stylesText={{fontSize: 16, fontFamily: FONTS.semiBold}}
+                      stylesButton={{paddingVertical: 15, backgroundColor: reasonCancel ?  COLORS.orange : COLORS.grey }}
+                      onPress={()=> reasonCancel && cancelScheduleId && cancelAppointment()}
+          />
+        </BottomSheetScrollView>
+        
+      </BottomSheet>    
+
       <LoadingModal modalVisible={isLoading} />
     </>
   );

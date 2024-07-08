@@ -57,8 +57,11 @@ const HomeScreen = ({ navigation }) => {
     try {
       const response = await API.get(`/post/`);
       if (response) {
-        console.log("Success get post")
-        const arrayAfterSort = response.data.sort((a,b)=> b.time_created.localeCompare(a.time_created));
+        console.log("Success get post");
+        const filterData = response.data.filter((e) => {
+          return e.is_active !== "false"
+        });
+        const arrayAfterSort = filterData.sort((a,b)=> b.time_created.localeCompare(a.time_created));
         setNewsFeed(arrayAfterSort);
       }
     } catch (error) {
@@ -213,7 +216,7 @@ const HomeScreen = ({ navigation }) => {
             }}
           >
           <Text style={{ fontFamily: FONTS.bold, fontSize: 18 }}>Tin mới nhất</Text>
-          <TouchableOpacity onPress={()=>{navigation.navigate("Splash")}}>
+          <TouchableOpacity onPress={()=>{}}>
               <Icon name="options" color={COLORS.grey} size={23}/>
             </TouchableOpacity>
           </View>

@@ -154,7 +154,8 @@ const CreatePostScreen = ({navigation}) => {
               const author = {
                 id: aboutMe._id,
                 image: aboutMe.image,
-                name: aboutMe.name
+                name: aboutMe.name,
+                email: aboutMe.email
             };
 
               formCreatePost.append("author", JSON.stringify(author));
@@ -179,8 +180,17 @@ const CreatePostScreen = ({navigation}) => {
         
               if (response) {
                 console.log(response);
+                //lấy lại thông tin mới tránh lạm dụng
                 getDataAuthor();
-                showToast(); 
+                showToast();
+                setTitle("");
+                setAdress('');
+                setPhone("");
+                setUtilities("");
+                setPrice("");
+                setArea("");
+                setDescription("");
+                setImages([]);
               } else {
                 console.log("Có lỗi khi đăng tin");
               }

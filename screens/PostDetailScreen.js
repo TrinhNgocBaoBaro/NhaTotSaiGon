@@ -5,7 +5,7 @@ import {
   Text,
   StatusBar,
   TouchableOpacity,
-  Button,
+  Alert,
   TextInput
 } from "react-native";
 import React from "react";
@@ -112,6 +112,7 @@ const PostDetailScreen = ({ navigation, route }) => {
   };
 
     const createFavourite = async () => {
+    setIsFavourite(true)
     try {
       const response = await API.post(`/account/favorite-post/${user_id}`,
         {
@@ -119,14 +120,15 @@ const PostDetailScreen = ({ navigation, route }) => {
         });
       if (response) {
         console.log("Success favourite!")
-        setIsFavourite(true)
       }
     } catch (error) {
       console.log(error);
+      setIsFavourite(false)
     } 
   };
 
   const deleteFavourite = async () => {
+    setIsFavourite(false)
     try {
       const response = await API.put(`/account/favorite-post/${user_id}`,
         {
@@ -134,12 +136,40 @@ const PostDetailScreen = ({ navigation, route }) => {
         });
       if (response) {
         console.log("Success delete favourite!")
-        setIsFavourite(false)
       }
     } catch (error) {
       console.log(error);
+      setIsFavourite(true)
     } 
   };
+
+
+  const deletePost = async () => {
+    setIsLoading(true);
+    try {
+      const response = await API.put(`/post/${post_id}`,
+        {
+          is_active: 'false',
+        });
+      if (response) {
+        fetchPostDetails();
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const showButtonConfirmDelete = () =>
+    Alert.alert('Xác nhận', 'Bạn có muốn xóa tin?', [
+      {
+        text: 'Hủy',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {text: 'Xóa', onPress: ()=> {deletePost()}},
+    ]);
 
   const setLoad = () => setIsLoading(false);
 
@@ -218,6 +248,9 @@ const PostDetailScreen = ({ navigation, route }) => {
               <Icon name="arrow-back-outline" size={28} color={COLORS.orange} />
             </View>
           </TouchableOpacity>
+          <View style={{flexDirection: 'row',}}>
+
+          
           <TouchableOpacity activeOpacity={0.5} onPress={isFavourite ? deleteFavourite : createFavourite}>
             <View
               style={{
@@ -233,6 +266,26 @@ const PostDetailScreen = ({ navigation, route }) => {
               <Icon name={isFavourite ? "heart" : "heart-outline"} size={25} color={COLORS.orange} />
             </View>
           </TouchableOpacity>
+          {postDetails.author.id === user_id &&
+          <TouchableOpacity 
+            activeOpacity={0.5} 
+            onPress={showButtonConfirmDelete}>
+            <View
+              style={{
+                height: 50,
+                width: 50,
+                marginRight: 20,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: COLORS.white,
+                borderRadius: 50,
+              }}
+            >
+              <Icon name={"trash-outline"} size={25} color={COLORS.orange} />
+            </View>
+          </TouchableOpacity>
+          }
+          </View>
         </View>
 
         <View

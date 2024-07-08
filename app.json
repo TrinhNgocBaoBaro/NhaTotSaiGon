@@ -2,7 +2,9 @@
   "expo": {
     "name": "NhaTotSaiGon",
     "slug": "NhaTotSaiGon",
-    "plugins": ["@react-native-google-signin/google-signin"],
+    "plugins": [
+      "@react-native-google-signin/google-signin"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,7 +30,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "d415e4cf-f084-49ea-97af-05f500113599"
+        "projectId": "8c19c0d9-81dd-4942-9ab8-fe7f62ad2320"
       }
     }
   }

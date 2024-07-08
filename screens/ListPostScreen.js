@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Alert } from 'react-native'
 import React from 'react'
 import Header from '../components/Header'
 import Icon from "react-native-vector-icons/Ionicons";
@@ -18,10 +18,13 @@ const ListPostScreen = ({navigation, route}) => {
 
   const fetchListPost = async () => {
     try {
-      const query = { area_from: '12', area_to: '50', "author.id": user_id };
+      const query = {"author.id": user_id };
       const response = await API.getWithQuery(`/post/`, query);
       if (response) {
-        const arrayAfterSort = response.data.sort((a,b)=> b.time_created.localeCompare(a.time_created));
+        const filterData = response.data.filter((e) => {
+          return e.is_active !== "false"
+        });
+        const arrayAfterSort = filterData.sort((a,b)=> b.time_created.localeCompare(a.time_created));
         setDataYourAppointment(arrayAfterSort);
       }
     } catch (error) {
@@ -30,6 +33,34 @@ const ListPostScreen = ({navigation, route}) => {
       setIsLoading(false);
     }
   };
+
+  const deletePost = async (post_id) => {
+    setIsLoading(true);
+    try {
+      const response = await API.put(`/post/${post_id}`,
+        {
+          is_active: 'false',
+        });
+      if (response) {
+        fetchListPost()
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const showButtonConfirm = (post_id) =>
+    Alert.alert('Xác nhận', 'Bạn có muốn xóa tin?', [
+      {
+        text: 'Hủy',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {text: 'Xóa', onPress: ()=> {deletePost(post_id)}},
+    ]);
+
+
 
   React.useEffect(() => {
     if(user_id) fetchListPost();
@@ -57,6 +88,7 @@ const ListPostScreen = ({navigation, route}) => {
                   onPress={() => {
                     navigation.navigate("PostDetail",{post_id: item._id});
                   }}
+                  onLongPress={()=> showButtonConfirm(item._id)}
                   activeOpacity={0.8}
                   style={{
                     backgroundColor: COLORS.white,
@@ -114,7 +146,7 @@ const ListPostScreen = ({navigation, route}) => {
                         fontSize: 12,
                         color: COLORS.grey,
                         marginTop: 5,
-                        alignSelf:  'flex-end'
+                        alignSelf:  'flex-end',
                       }}
                     >
                       {moment(item.time_created).fromNow()}

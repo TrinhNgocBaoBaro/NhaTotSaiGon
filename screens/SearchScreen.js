@@ -8,122 +8,70 @@ import {
   FlatList,
   Image
 } from "react-native";
-import React from "react";
+import React, { useRef } from "react";
+import _ from "lodash";
 import COLORS from "../constants/color";
 import FONTS from "../constants/font";
 import Icon from "react-native-vector-icons/Ionicons";
 import Modal from "react-native-modal";
+import { MaterialIndicator } from 'react-native-indicators'
 import { ButtonFlex } from "../components/Button";
+import { formatCurrency } from "../utils";
 
-const dataAreaFilter = [
-  {
-    id: 1,
-    data: "Dưới 20 m²",
-  },
-  {
-    id: 2,
-    data: "20 - 30 m²",
-  },
-  {
-    id: 3,
-    data: "30 - 40 m²",
-  },
-  {
-    id: 4,
-    data: "40 - 50 m²",
-  },
-  {
-    id: 5,
-    data: "Trên 50 m²",
-  },
-];
+import createAxios from "../utils/axios";
+const API = createAxios();
 
 const dataPriceFilter = [
   {
     id: 1,
+    price_from: 0,
+    price_to: 1500000,
     data: "< 1.5 triệu",
   },
   {
     id: 2,
+    price_from: 1500001,
+    price_to: 3000000,
     data: "1.5 triệu - 3 triệu",
   },
   {
     id: 3,
+    price_from: 3000001,
+    price_to: 100000000000,
     data: "> 3 triệu",
   },
 ];
 
-const searchList = [
+const dataAreaFilter = [
   {
-    id: "1",
-    name: "Bơ Bán Bò",
-    address: "203 Đ.Lê Văn Việt, Hiệp Phú, Quận 9",
-    time: "23",
-    image:
-      "https://file4.batdongsan.com.vn/2022/08/26/PHJN6Zw0/20220826100833-50e4.jpg",
-    latitude: 10.8441,
-    longitude: 106.78288,
+    id: 1,
+    area_from: 0,
+    area_to: 19,
+    data: "Dưới 20 m²",
   },
   {
-    id: "2",
-    name: "No-Ne Bistro",
-    address: "48 Đường Nguyễn Văn Mai, Phường 8, Quận 3",
-    time: "70",
-    image:
-      "https://pt123.cdn.static123.com/images/thumbs/900x600/fit/2021/02/22/cho-thue-phong-tro_1613975723.jpg",
-    latitude: 10.790032685611157,
-    longitude: 106.68744825401734,
+    id: 2,
+    area_from: 20,
+    area_to: 30,
+    data: "20 - 30 m²",
   },
   {
-    id: "3",
-    name: "A Mà Kitchen",
-    address: "62 Võ Văn Tần, Phường 6, Quận 3",
-    time: "60",
-    image:
-      "https://offer.rever.vn/hubfs/cho_thue_phong_tro_moi_xay_gia_re_ngay_phuong_15_tan_binh3.jpg",
-    latitude: 10.7768469439067,
-    longitude: 106.69026283867206,
+    id: 3,
+    area_from: 30,
+    area_to: 40,
+    data: "30 - 40 m²",
   },
   {
-    id: "4",
-    name: "King BBQ",
-    address: "50 Lê Văn Việt, Hiệp Phú, Quận 9",
-    time: "50",
-    image:
-      "https://cafefcdn.com/203337114487263232/2022/8/5/83-1659675881831241642789.jpeg",
-    latitude: 10.847411218830398,
-    longitude: 106.7762775617879,
+    id: 4,
+    area_from: 40,
+    area_to: 50,
+    data: "40 - 50 m²",
   },
   {
-    id: "5",
-    name: "Hanuri-Korean Fast Food",
-    address: "284 Nguyễn Đình Chiểu, Phường 6, Quận 3",
-    time: "70",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQU_EcqcGnIaUjkMyVVFrgxVEV8HVilApXvx0QFJZRc7wr3DbYLjpwseMEGLTjONbYe7Nk&usqp=CAU",
-    latitude: 10.775871102987148,
-    longitude: 106.68727154052584,
-  },
-  {
-    id: "6",
-    name: "Kichi Kichi",
-    address:
-      "Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9 Số 338 Đỗ Xuân Hợp, Phước Long A, Quận 9",
-    time: "25",
-    image:
-      "https://vatlieuso.com/wp-content/uploads/2021/10/chi-phi-xay-nha-tro.jpg",
-    latitude: 10.822944055835185,
-    longitude: 106.77066314829463,
-  },
-  {
-    id: "7",
-    name: "Maison Mận-Đỏ",
-    address: "27J Đ. Trần Nhật Duật, Phường Tân Định, Quận 1, TP.Hồ Chí Minh",
-    time: "75",
-    image:
-      "https://baohanam-fileserver.nvcms.net/IMAGES/2023/09/13/20230913181412-97tro.jpg",
-    latitude: 10.793057450832194,
-    longitude: 106.69022156701138,
+    id: 5,
+    area_from: 50,
+    area_to: 1000000000000,
+    data: "Trên 50 m²",
   },
 ];
 
@@ -146,7 +94,70 @@ const SearchScreen = ({navigation}) => {
   const [showModalFilters, setShowModalFilters] = React.useState(false);
   const [priceFilter, setPriceFilter] = React.useState();
   const [areaFilter, setAreaFilter] = React.useState();
+  const [textSearch, setTextSearch] = React.useState();
+  const [displayList, setDisplayList] = React.useState([]);
+  const [buttonLoading, setButtonLoading] = React.useState(false);
 
+  // const [areaFrom, setAreaFrom] = React.useState();
+  // const [areaTo, setAreaTo] = React.useState();
+
+  // const [priceFrom, setPriceFrom] = React.useState();
+  // const [priceTo, setPriceTo] = React.useState();
+
+
+  React.useEffect(() => {
+    if (textSearch) {
+      debouncedSearch(textSearch);
+    } else {
+      setDisplayList([]);
+    }
+  }, [textSearch, debouncedSearch]);
+
+  const filterPost = async () => {
+    setButtonLoading(true);
+    try {
+      const query = {};
+      if (areaFilter) {
+        query.area_from = areaFilter.area_from;
+        query.area_to = areaFilter.area_to;
+      }
+      if (priceFilter) {
+        query.price_from = priceFilter.price_from;
+        query.price_to = priceFilter.price_to;
+      }
+      const response = await API.getWithQuery(`/post/`, query);
+      if (response) {
+        const filterData = response.data.filter((e) => {
+          return e.is_active !== "false"
+        });
+        const arrayAfterSort = filterData.sort((a,b)=> b.time_created.localeCompare(a.time_created));
+        setDisplayList(arrayAfterSort);
+      }
+    } catch (error) {
+      console.log(error);
+    }finally{
+      setShowModalFilters(!showModalFilters)
+      setButtonLoading(false);
+    }
+  };
+
+  const debouncedSearch = useRef(_.debounce(async (searchText) => {
+    try {
+      const query = { text_search: searchText };
+      const response = await API.getWithQuery(`/post/search`, query);
+      if (response) {
+        const filterData = response.data.filter((e) => {
+          return e.is_active !== "false"
+        });
+        const arrayAfterSort = filterData.sort((a,b)=> b.time_created.localeCompare(a.time_created));
+        setDisplayList(arrayAfterSort);
+        console.log("Search")
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, 500)).current;
+  
   return (
     <>
       <View
@@ -168,9 +179,15 @@ const SearchScreen = ({navigation}) => {
               <TextInput
                 style={styles.input}
                 placeholder="Tìm kiếm đường, quận..."
-                // onFocus={() => {navigation.navigate("Tìm kiếm")}}
+                onChangeText={(txt) => setTextSearch(txt)}
+                value={textSearch}
               />
-              <Icon name="search" size={23} color={COLORS.grey} />
+              <Icon name={textSearch ? "close" : "search"} size={23} color={COLORS.grey} onPress={()=>{
+                if(textSearch) {
+                  setTextSearch("");
+                  setDisplayList([]) 
+                } 
+              }}/>
             </View>
             <TouchableOpacity
               onPress={() => setShowModalFilters(true)}
@@ -298,25 +315,36 @@ const SearchScreen = ({navigation}) => {
                   numColumns={2}
                   keyExtractor={(item) => item.id}
                 />
-
+                {buttonLoading ?
+                <View style={{marginVertical: 20,}}>
+                  <MaterialIndicator size={30} color={COLORS.orange} />
+                </View>
+                :
                 <ButtonFlex
                   title={"Áp dụng"}
-                  onPress={() => setShowModalFilters(!showModalFilters)}
+                  onPress={() => filterPost()}
                   stylesText={{ fontSize: 16, fontFamily: FONTS.semiBold }}
                   stylesButton={{ paddingVertical: 15 }}
                 />
+                }
               </View>
             </Modal>
 
           </View>
         </View>
+        {displayList.length === 0 ?
+         <View style={{flex: 1, backgroundColor: COLORS.white, alignItems: 'center',justifyContent: 'center', paddingBottom: 80}}>
+          <Icon name="receipt-outline" size={100} color={COLORS.darkGrey}/>
+          <Text style={{fontFamily: FONTS.semiBold, color: COLORS.lightGrey, fontSize: 15, marginTop: 10,}}>{textSearch || areaFilter || priceFilter ? "Không tìm thấy bài đăng." : "Nhập để tìm kiếm.."}</Text>
+        </View>
+       :
         <FlatList
               showsVerticalScrollIndicator={false}
-              data={searchList}
+              data={displayList}
               renderItem={({ item, index }) => (
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate("PostDetail");
+                    navigation.navigate("PostDetail", {post_id: item._id});
                   }}
                   activeOpacity={0.8}
                   style={{
@@ -330,7 +358,7 @@ const SearchScreen = ({navigation}) => {
                   }}
                 >
                   <Image
-                    source={{ uri: item.image }}
+                    source={{ uri: item.images[0] }}
                     style={{ height: 100, width: 100, borderRadius: 5 }}
                   />
                   <View
@@ -357,7 +385,7 @@ const SearchScreen = ({navigation}) => {
                         marginTop: 5,
                       }}
                     >
-                      Diện tích: {item.time} m²
+                      Diện tích: {item.area} m²
                     </Text>
                     <Text
                       style={{
@@ -367,15 +395,16 @@ const SearchScreen = ({navigation}) => {
                         marginTop: 5,
                       }}
                     >
-                      7.200.000đ/1 tháng
+                      {formatCurrency(item.price)}/1 tháng
                     </Text>
                   </View>
   
                 </TouchableOpacity>
               )}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item._id}
               style={{ backgroundColor: COLORS.white }}
-            />
+        />
+      }
       </View>
     </>
   );

@@ -151,7 +151,9 @@ const CreateAppointmentScreen = ({ navigation, route }) => {
         {
           post_id: postDetails._id,
           renter_id: aboutMe._id,
+          renter_email: aboutMe.email,
           owner_id: postDetails.author.id,
+          owner_email: postDetails.author.email,
           address: postDetails.address,
           image: postDetails.images[0],
           price: postDetails.price,
