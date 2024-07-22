@@ -3,7 +3,16 @@
     "name": "NhaTotSaiGon",
     "slug": "NhaTotSaiGon",
     "plugins": [
-      "@react-native-google-signin/google-signin"
+      "@react-native-google-signin/google-signin",
+      [
+      "react-native-fbsdk-next",
+      {
+        "appID": "444057831932332",
+        "clientToken": "500236f5d28ab49c00d30c2ab219e52c",
+        "displayName": "NhaTotSaiGon",
+        "scheme": "fb444057831932332"
+      }
+      ]
     ],
     "version": "1.0.0",
     "orientation": "portrait",

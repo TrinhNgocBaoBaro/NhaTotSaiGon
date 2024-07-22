@@ -16,7 +16,7 @@ const SplashScreen = () => {
     <>
       <ScrollView style={{ backgroundColor: COLORS.white, flex: 1 }}>
         {/* <LoadingModal modalVisible={true} color={'white'} /> */}
-        <View style={{ width: width, height: height }}>
+        <View style={{ width: width, height: height}}>
           <Image
             source={require("../assets/splash.png")}
             resizeMode="cover"

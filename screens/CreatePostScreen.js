@@ -14,14 +14,18 @@ import { getDataAboutMe } from "../utils/api";
 import { formatCurrency } from "../utils";
 import createAxios from "../utils/axios";
 import LoadingModal from "../components/LoadingModal";
+import Modal from "react-native-modal";
+
 const API = createAxios();
 
 const CreatePostScreen = ({navigation}) => {
     const isFocused = useIsFocused();
 
     const {initPaymentSheet, presentPaymentSheet } = useStripe();
+    const [showModalInformation, setShowModalInformation] = React.useState(false);
 
     const [images, setImages] = React.useState([]);
+    const [video, setVideo] = React.useState();
     const [title, setTitle] = React.useState("");
     const [description, setDescription] = React.useState("");
     const [utilities, setUtilities] = React.useState("");
@@ -32,11 +36,8 @@ const CreatePostScreen = ({navigation}) => {
     const [isLoading, setIsLoading] = React.useState(true);
     const [aboutMe, setAboutMe] = React.useState();
     const [profileId, setProfileId] = React.useState();
-    const [amount, setAmount] = React.useState(50000);
+    const [amount, setAmount] = React.useState(100000);
 
-    // React.useEffect(() => {
-    //   console.log(price)
-    // }, [price]);
     const fetchDataAboutMe = async () => {
       try {
         const data = await getDataAboutMe();
@@ -61,6 +62,10 @@ const CreatePostScreen = ({navigation}) => {
       fetchDataAboutMe()
     }, []);
 
+    React.useEffect(() => {
+      console.log("Video: ", JSON.stringify(video,null,2));
+    }, [video]);
+
     
     React.useEffect(() => {
       if(profileId) getDataAuthor();
@@ -68,7 +73,7 @@ const CreatePostScreen = ({navigation}) => {
 
     const calculatePrice = () => {
       let amountForNew = amount * 0.5;
-      let amountV = aboutMe.amount_spent >= 100000 ? amount * 0.7 : amount
+      let amountV = aboutMe.amount_spent >= 500000 ? amount * 0.7 : amount
 
         if(aboutMe){
           return aboutMe.is_new === true ? amountForNew : amountV
@@ -94,7 +99,7 @@ const CreatePostScreen = ({navigation}) => {
       const pickImage = async () => {
         // No permissions request is necessary for launching the image library
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
           aspect: [4, 3],
           quality: 1,
@@ -105,6 +110,23 @@ const CreatePostScreen = ({navigation}) => {
     
         if (!result.canceled) {
           setImages([...images, result.assets[0]]);
+        }
+      };
+
+      const pickVideo = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+
+        console.log(result);
+
+    
+        if (!result.canceled) {
+          setVideo(result.assets[0]);
         }
       };
 
@@ -200,17 +222,11 @@ const CreatePostScreen = ({navigation}) => {
           };   
 
           const fetchPaymentSheetParams = async () => {
-            const response = await fetch('http://192.168.1.3:3000/stripe/create-payment-intent', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
+            const response = await API.post('/stripe/create-payment-intent', {
                 amount: calculatePrice(), // Ví dụ: số tiền cần thanh toán (1000 cents = 10 USD)
-              }),
             });
-            // if(response) console.log(response.clientSecret)
-            const { clientSecret } = await response.json();
+            if(response) console.log(response.clientSecret)
+            const { clientSecret } = await response;
             return { clientSecret };
           };
 
@@ -253,8 +269,9 @@ const CreatePostScreen = ({navigation}) => {
       <Header
         title={"Đăng tin"}
         leftIcon={"close"}
-        rightIcon={"information-circle-outline"}
+        rightIcon={"information-circle"}
         onPress={() => navigation.goBack()}
+        onPressRight={()=>setShowModalInformation(!showModalInformation)}
       />
       <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1, backgroundColor: COLORS.white, marginBottom: 80}} contentContainerStyle={{ padding: 20}}>
       <View style={{ marginBottom: 25 }}>
@@ -443,6 +460,27 @@ const CreatePostScreen = ({navigation}) => {
               </View>
           </View>
 
+          <View>
+          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15, marginBottom: 15 }}>
+            Video ({video ? 1 : 0}/1)
+          </Text>
+              <View style={{flexDirection: 'row', justifyContent:  'flex-start', marginBottom: 20,flexWrap: 'wrap'}}>
+              {video ?
+                    <View style={{ marginBottom: 20, width: '30%', height:100, backgroundColor: COLORS.white, alignItems: 'center', justifyContent: 'center', borderRadius: 10, marginRight: '3.33333333333333333333333333333333333333333333333333333333333333333%'}}>
+             
+                        <View style={{width: '100%', height: '100%'}}>
+                        <Image source={{uri:  video.uri}}   width={"100%"} height={"100%"} style={{borderRadius: 5}}/>
+                        <Icon name="close-circle" size={20} color={COLORS.orange} style={{position: 'absolute', right: -10, top: -10, backgroundColor: COLORS.white, borderRadius: 50}}  onPress={() => setVideo()} /> 
+                        </View>                      
+                    </View>
+                    :
+                    <TouchableOpacity onPress={pickVideo} style={{width: '30%', height:100, backgroundColor: COLORS.white, borderWidth: 2, borderColor: COLORS.darkGrey, alignItems: 'center', justifyContent: 'center', borderRadius: 10}}>
+                        <Icon name="add" size={32} color={COLORS.grey}/>
+                    </TouchableOpacity>
+                }
+              </View>
+          </View>
+
       </ScrollView>
       {aboutMe && 
       <ButtonFloatBottom title={`Đăng (${formatCurrency(calculatePrice())})`} 
@@ -454,6 +492,31 @@ const CreatePostScreen = ({navigation}) => {
           />
         }
       {/* <Button title="Checkout" onPress={openPaymentSheet}/> */}
+      <Modal isVisible={showModalInformation} 
+             onBackdropPress={()=> setShowModalInformation(!setShowModalInformation)}
+             animationOutTiming={300}
+             animationInTiming={300}
+             hasBackdrop={true}
+             backdropColor="#f5f5f5"
+             animationIn={"fadeInUp"}
+             animationOut={"fadeOut"}
+      >
+        <View style={{width: 'auto', height: 'auto', backgroundColor: COLORS.white, borderRadius: 10, padding: 20, borderWidth: 2, borderColor: COLORS.orange}}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+          <Text style={{fontFamily: FONTS.semiBold, fontSize: 18}}>Thông tin đăng tin</Text>
+          <Icon name="close-circle" size={34} color={COLORS.orange} onPress={()=> setShowModalInformation(!showModalInformation)}/>
+          </View>
+          <View style={{marginTop: 20,}}>
+            <Text style={{fontFamily: FONTS.semiBold, marginBottom: 5}}>- Giá đăng bài cố định: <Text style={{color: COLORS.orange, fontFamily: FONTS.bold}}>{formatCurrency(amount)}</Text> / 1 tin.</Text>
+            <Text style={{fontFamily: FONTS.semiBold, marginBottom: 5}}>- Đối với khách hàng mới: giảm giá <Text style={{color: COLORS.green, fontFamily: FONTS.bold}}>50%</Text> cho bài đăng đầu tiên.</Text>
+            <Text style={{fontFamily: FONTS.semiBold, marginBottom: 20}}>- Với số tiền đã dùng trên <Text style={{color: COLORS.orange, fontFamily: FONTS.bold}}>{formatCurrency(500000)}</Text>: giảm giá <Text style={{color: COLORS.green, fontFamily: FONTS.bold}}>30%</Text> trên mỗi bài đăng.</Text>
+            <View style={{flexDirection: 'row', marginBottom: 5}}>
+              <Text style={{fontFamily: FONTS.semiBold, marginBottom: 5}}>Số tiền bạn đã dùng: </Text>
+              <Text style={{color: COLORS.orange, fontFamily: FONTS.bold}}>{formatCurrency(aboutMe && aboutMe.amount_spent)}</Text>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <LoadingModal modalVisible={isLoading}/>
     </>
   );

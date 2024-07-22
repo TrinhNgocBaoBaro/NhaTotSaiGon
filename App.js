@@ -33,7 +33,7 @@ import FavouriteScreen from "./screens/FavouriteScreen";
 import SplashScreen from "./screens/SplashScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import ListPostScreen from "./screens/ListPostScreen";
-import LoadingModal from "./components/LoadingModal";
+import HelpCenterScreen from "./screens/HelpCenterScreen";
 
 const toastConfig = {
   success: (props) => (
@@ -268,7 +268,6 @@ export default function App() {
       {({ user, initializing, userId }) => 
       {
         console.log("Init ở App:", initializing)
-      
         // if(initializing) {
         //   return  (
         //     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -320,6 +319,7 @@ export default function App() {
           <Stack.Screen name="CreatePost" component={CreatePostScreen} />
           <Stack.Screen name="Favourite" component={FavouriteScreen} initialParams={{user_id: userId}}/>
           <Stack.Screen name="ListPost" component={ListPostScreen} initialParams={{user_id: userId}} />
+          <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           </>
         ) : (

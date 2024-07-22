@@ -269,19 +269,19 @@ const AppointmentScreen = ({navigation, route}) => {
       </View>
       <View
             style={{
-              alignItems: "flex-end",
-              justifyContent: "space-between",
+              flexDirection: 'row',
+              justifyContent: 'space-between',
               backgroundColor: COLORS.white,
               paddingHorizontal: 15,
-              paddingTop: 15
+              paddingTop: 15,
             }}
           >
-          <ScrollView contentContainerStyle={{alignItems: 'center', justifyContent: 'center'}} horizontal showsHorizontalScrollIndicator={false}>
           {dataFilter.map((itemFilter,index)=>(
           <TouchableOpacity
           key={index}
           activeOpacity={0.8}
-          style={{flexDirection: 'column', alignItems:'center', borderWidth: 0, borderColor: itemFilter.id === filterStatus ? COLORS.orange : COLORS.grey, borderRadius: 8, padding: 10, marginRight: 10}} 
+          style={{
+            flexDirection: 'column', alignItems:'center', borderWidth: 0, borderColor: itemFilter.id === filterStatus ? COLORS.orange : COLORS.grey, borderRadius: 8, padding: 10, marginRight: 0}} 
           onPress={()=>{handleFilterChange(itemFilter.id)}}>
               <Icon name={itemFilter.icon} color={itemFilter.id === filterStatus ? COLORS.orange : COLORS.grey} size={30}/>
               <Text style={{marginTop: 5, fontFamily: FONTS.semiBold, fontSize: 13, color: itemFilter.id === filterStatus ? COLORS.orange : COLORS.grey }}>
@@ -289,7 +289,7 @@ const AppointmentScreen = ({navigation, route}) => {
               </Text>
           </TouchableOpacity>
             ))}
-          </ScrollView>
+         
       </View>
       {currentTabView === 1 && (
         displayYourAppointment.length === 0 ?
@@ -737,7 +737,7 @@ const AppointmentScreen = ({navigation, route}) => {
             backdropComponent={renderBackdrop}
       >
       
-        <BottomSheetScrollView style={{width: 'auto', height: 'auto', backgroundColor: COLORS.white, borderRadius: 10, padding: 20,}}>
+        <BottomSheetScrollView style={{width: 'auto', height: 'auto', backgroundColor: COLORS.white, borderRadius: 10, padding: 20}}>
           <Text style={{fontFamily: FONTS.semiBold, fontSize: 18, color: COLORS.black}}>Lý do hủy</Text>
           <TextInput
             style={{    

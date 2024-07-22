@@ -19,6 +19,7 @@ import Modal from "react-native-modal";
 import { formatCurrency, moment } from "../utils";
 import LoadingModal from "../components/LoadingModal";
 import ContentModal from "../components/ContentModal";
+import { Video, ResizeMode } from 'expo-av';
 
 import { getDataAboutMe } from "../utils/api";
 import createAxios from "../utils/axios";
@@ -27,6 +28,12 @@ const API = createAxios();
 const PostDetailScreen = ({ navigation, route }) => {
 
   const { post_id, user_id } = route.params;
+
+
+  const video = React.useRef(null);
+  const [status, setStatus] = React.useState({});
+
+
 
   React.useEffect(() => {
    console.log("User_id_initParams: ",user_id)
@@ -287,6 +294,26 @@ const PostDetailScreen = ({ navigation, route }) => {
           }
           </View>
         </View>
+
+        <Video
+        ref={video}
+        style={styles.video}
+        source={{
+          uri: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4',
+        }}
+        useNativeControls
+        resizeMode={ResizeMode.CONTAIN}
+        isLooping
+        onPlaybackStatusUpdate={status => setStatus(() => status)}
+      />
+      <View style={styles.buttons}>
+        <Button
+          title={status.isPlaying ? 'Pause' : 'Play'}
+          onPress={() =>
+            status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()
+          }
+        />
+      </View>
 
         <View
           style={{
@@ -663,5 +690,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 1,
     padding: 20,
-  }
+  },
+  video: {
+    alignSelf: 'center',
+    width: 320,
+    height: 200,
+  },
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

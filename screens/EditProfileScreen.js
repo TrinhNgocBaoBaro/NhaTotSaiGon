@@ -32,7 +32,6 @@ const EditProfileScreen = ({ navigation, route }) => {
   const [name, setName] = React.useState();
   const [address, setAddress] = React.useState();
   const [phone, setPhone] = React.useState();
-  const [isPrivate, setIsPrivate] = React.useState();
 
   const [images, setImages] = React.useState();
   const [noti, setNoti] = React.useState();
@@ -42,7 +41,7 @@ const EditProfileScreen = ({ navigation, route }) => {
       const response = await API.get(`/account/${profile_id}`);
       if (response) {
         setAboutMe(response.data);
-        AsyncStorage.setItem('UserLoggedInData', JSON.stringify(response.data));
+        await AsyncStorage.setItem('UserLoggedInData', JSON.stringify(response.data));
       }
     } catch (error) {
       console.log(error);
@@ -56,19 +55,8 @@ const EditProfileScreen = ({ navigation, route }) => {
       setName(aboutMe.name);
       setAddress(aboutMe.address);
       setPhone(aboutMe.phone);
-      setIsPrivate(aboutMe.is_private)
     }
   }, [aboutMe]);
-
-  // React.useEffect(() => {
-  //   if(aboutMe) {
-  //      AsyncStorage.setItem('UserLoggedInData', JSON.stringify(aboutMe));
-  //   }
-  // }, [aboutMe]);
-
-  React.useEffect(() => {
-      console.log("Private nès:", typeof isPrivate + " | chữ: " + isPrivate)
-  }, [isPrivate]);
 
 
   React.useEffect(() => {
@@ -129,7 +117,6 @@ const EditProfileScreen = ({ navigation, route }) => {
       formUpdateProfile.append("name", name.trim());
       formUpdateProfile.append("phone", phone.trim());
       formUpdateProfile.append("address", address.trim());
-      formUpdateProfile.append("is_private", isPrivate);
 
 
       const response = await API.putWithHeaders(`/account/${profile_id}`, 
@@ -170,7 +157,7 @@ const EditProfileScreen = ({ navigation, route }) => {
       <ScrollView
         style={{ flex: 1, backgroundColor: COLORS.white, padding: 20 }} contentContainerStyle={{paddingBottom: 100}}
       >
-        <View style={{ alignItems: "center", marginBottom: 20 }}>
+        <View style={{ alignItems: "center", marginBottom: 40 }}>
           <View>
             <Image
               source={{
@@ -221,26 +208,6 @@ const EditProfileScreen = ({ navigation, route }) => {
               {aboutMe && aboutMe.email}
               </Text>
           </View>
-        </View>
-
-        <View
-          style={{
-            marginBottom: 25,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 15 }}>
-            Quyền riêng tư
-          </Text>
-          <TouchableOpacity onPress={()=> setIsPrivate(!isPrivate)}>
-            <Icon1
-              name={isPrivate && isPrivate ? "toggle-on" : "toggle-off"}
-              size={28}
-              color={isPrivate && isPrivate? COLORS.orange : COLORS.grey}
-            />
-          </TouchableOpacity>
         </View>
 
         <View style={{ marginBottom: 25 }}>

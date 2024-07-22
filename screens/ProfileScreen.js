@@ -14,13 +14,11 @@ import {
 import React, { useContext } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
 import Icon1 from "react-native-vector-icons/FontAwesome";
+import Icon2 from "react-native-vector-icons/Feather";
 
-import auth from "@react-native-firebase/auth";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { getDataAboutMe } from "../utils/api";
 import FONTS from "../constants/font";
 import { formatCurrency } from "../utils";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import createAxios from "../utils/axios";
 import COLORS from "../constants/color";
@@ -68,6 +66,7 @@ const ProfileScreen = ({ navigation }) => {
     try {
       const data = await getDataAboutMe();
       setAboutMe(data);
+      console.log(data)
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -76,6 +75,10 @@ const ProfileScreen = ({ navigation }) => {
   };
 
   const updatePrivate = async () => {
+    setAboutMe(prevState => ({
+      ...prevState,
+      is_private: !prevState.is_private
+    }));
     try {
       const response = await API.put(`/account/${aboutMe._id}`,
         {
@@ -84,14 +87,20 @@ const ProfileScreen = ({ navigation }) => {
       );
       if (response) {
         console.log("Success updatePrivate");
-        AsyncStorage.setItem('UserLoggedInData', JSON.stringify(response.data));
-        setAboutMe(prevState => ({
-          ...prevState,
-          is_private: !prevState.is_private
-        }));
+        await AsyncStorage.setItem('UserLoggedInData', JSON.stringify(response.data));
+        // setAboutMe(prevState => ({
+        //   ...prevState,
+        //   is_private: !prevState.is_private
+        // }));
+        setAboutMe(response.data);
       }
     } catch (error) {
       console.log(error);
+      setAboutMe(prevState => ({
+        ...prevState,
+        is_private: !prevState.is_private
+      }));
+      console.log("eror")
     }
   };
 
@@ -100,14 +109,9 @@ const ProfileScreen = ({ navigation }) => {
   }, []);
 
   React.useEffect(() => {
-
-    if(aboutMe)setIsLoading(false);
-   
+    if(aboutMe) setIsLoading(false);
   }, [aboutMe]);
 
-  // if (isLoading) {
-  //   return <LoadingModal modalVisible={isLoading} />;
-  // }
   const cacheAndCellularItems = [
     {
       icon: "shield-checkmark-outline",
@@ -154,15 +158,6 @@ const ProfileScreen = ({ navigation }) => {
         },
         {
           text: "Đăng xuất",
-          // onPress: async () => {
-          //   try {
-          //     await auth().signOut();
-          //     await GoogleSignin.signOut();
-          //     console.log("User signed out!");
-          //   } catch (error) {
-          //     console.error("Error signing out: ", error);
-          //   }
-          // },
           onPress: signOut
         },
       ],
@@ -199,18 +194,20 @@ const ProfileScreen = ({ navigation }) => {
         <View style={styles.top}>
           <Pressable onPress={() => navigation.goBack()}>
             <View style={styles.topButton}>
-              <Icon name="person-outline" size={28} color={"black"} />
+              <Icon2 name="user" size={30} color={"black"} />
             </View>
           </Pressable>
           <View style={{ justifyContent: "center" }}>
             <Text style={styles.title}>Tài khoản</Text>
           </View>
-          <Pressable
+          <TouchableOpacity
             style={styles.topButton}
-            onPress={() => {}}
+            onPress={() => navigation.navigate("HelpCenter")}
           >
-            <Icon name="ellipsis-vertical" size={25} color={"black"} />
-          </Pressable>
+            <Image source={{uri: "https://www.clipartmax.com/png/middle/192-1921774_services-call-center.png"}} 
+              width={35} height={35} resizeMode="cover" style={{borderRadius: 150}}
+          />
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
       {aboutMe ? 
@@ -239,7 +236,13 @@ const ProfileScreen = ({ navigation }) => {
               </View>
               <View>
                 <Icon name="notifications-outline" size={26} color={"grey"} />
-              </View>
+              </View>             
+            </View>
+            
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, marginVertical: 10, elevation: 2, backgroundColor: COLORS.white, paddingHorizontal: 10, paddingVertical: 15, borderRadius: 5}}>
+                <Text style={{fontFamily: FONTS.semiBold, fontSize: 15}}>Tổng tiền đã chi tiêu: </Text>
+                <Text style={{fontFamily: FONTS.bold, fontSize: 16, color: COLORS.orange}}>{formatCurrency(aboutMe.amount_spent)}</Text>
+
             </View>
     
             <View style={{ marginHorizontal: 20 }}>
@@ -369,6 +372,7 @@ const styles = StyleSheet.create({
     height: 40,
     width: 40,
     marginLeft: 20,
+    marginRight: 10,
     justifyContent: "center",
   },
   title: {

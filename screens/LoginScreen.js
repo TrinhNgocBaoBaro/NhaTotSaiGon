@@ -7,7 +7,8 @@ import {
   Image,
   TextInput,
   ScrollView,
-  Button
+  Button,
+  ActivityIndicator 
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import COLORS from "../constants/color";
@@ -17,12 +18,17 @@ import AuthContext from "../context/AuthContext";
 import LoadingModal from "../components/LoadingModal";
 
 const LoginScreen = ({ route }) => {
-  const { signInWithGoogle, signOut } = useContext(AuthContext);
-  // const { initializing } = route.params
+  const { signInWithGoogle, signInWithFacebook, signOut, initializing } = useContext(AuthContext);
   
-  // React.useEffect(()=>{
-  //   console.log("Alo: ", initializing);
-  // },[])
+  React.useEffect(()=>{
+    console.log("Alo: ", initializing);
+  },[])
+
+  if (initializing) {
+    return (
+      <LoadingModal modalVisible={true}/>
+    );
+  }
 
 
   return (
@@ -60,7 +66,7 @@ const LoginScreen = ({ route }) => {
             <TextInput
               style={styles.textInput}
               secureTextEntry={true}
-              placeholder="***************"
+              placeholder="************"
             />
           </View>
         </View>
@@ -88,6 +94,17 @@ const LoginScreen = ({ route }) => {
             style={styles.googleLogo}
           />
           <Text style={{ fontFamily: FONTS.bold }}>Đăng nhập với Google</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={signInWithFacebook}
+          style={styles.googleButton}
+        >
+          <Image
+            source={require("../assets/FacebookLogin.png")}
+            style={styles.googleLogo}
+          />
+          <Text style={{ fontFamily: FONTS.bold }}>Đăng nhập với Facebook</Text>
         </TouchableOpacity>
       </View>
       </View>
@@ -189,7 +206,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 40,
+    marginBottom: 20,
     padding: 10,
     width: "100%",
     backgroundColor: COLORS.greyPastel,
