@@ -6,7 +6,8 @@ import {
   StatusBar,
   TouchableOpacity,
   Alert,
-  TextInput
+  TextInput,
+  Button
 } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -32,12 +33,9 @@ const PostDetailScreen = ({ navigation, route }) => {
 
   const video = React.useRef(null);
   const [status, setStatus] = React.useState({});
+  const [showVideo, setShowVideo] = React.useState(false);
+  const [autoPlaySwiper, setAutoPlaySwiper] = React.useState(true);
 
-
-
-  React.useEffect(() => {
-   console.log("User_id_initParams: ",user_id)
-  }, [user_id]);
 
   const [showMoreDescription, setShowMoreDescription] = React.useState(false);
   const [showModalComment, setShowModalComment] = React.useState(false);
@@ -180,7 +178,10 @@ const PostDetailScreen = ({ navigation, route }) => {
 
   const setLoad = () => setIsLoading(false);
 
-  
+  React.useEffect(() => {
+     setAutoPlaySwiper(false);
+  }, [status.isPlaying]);
+
   React.useEffect(() => {
     if(user_id) fetchDataAboutMe();
     if(post_id) fetchPostDetails();    
@@ -208,7 +209,7 @@ const PostDetailScreen = ({ navigation, route }) => {
           <Swiper
             style={styles.wrapper}
             showsButtons={false}
-            autoplay={true}
+            autoplay={autoPlaySwiper}
             activeDotColor={COLORS.orange}
             dotColor={COLORS.white}
             paginationStyle={{ marginBottom: 30 }}
@@ -295,25 +296,7 @@ const PostDetailScreen = ({ navigation, route }) => {
           </View>
         </View>
 
-        <Video
-        ref={video}
-        style={styles.video}
-        source={{
-          uri: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4',
-        }}
-        useNativeControls
-        resizeMode={ResizeMode.CONTAIN}
-        isLooping
-        onPlaybackStatusUpdate={status => setStatus(() => status)}
-      />
-      <View style={styles.buttons}>
-        <Button
-          title={status.isPlaying ? 'Pause' : 'Play'}
-          onPress={() =>
-            status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()
-          }
-        />
-      </View>
+
 
         <View
           style={{
@@ -325,7 +308,50 @@ const PostDetailScreen = ({ navigation, route }) => {
             marginBottom: 120,
           }}
         >
-          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }} onPress={checkFavourite}>
+        {showVideo &&
+        <Video
+        ref={video}
+        style={styles.video}
+        source={{
+          uri:  postDetails.video,
+        }}
+        useNativeControls
+        resizeMode={ResizeMode.CONTAIN}
+        isLooping
+        onPlaybackStatusUpdate={status => setStatus(() => status)}
+        />
+        }
+          <View style={styles.buttons}>
+        <TouchableOpacity
+        activeOpacity={0.8}
+        style={{flexDirection: 'row', alignItems: 'center',backgroundColor: COLORS.white, marginRight: 10, borderColor: COLORS.orange}}
+        onPress={() =>
+          // status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()
+          setShowVideo(!showVideo)
+        }
+        > 
+        {!showVideo && postDetails.video ?
+        <>
+        <Video 
+          // source={{uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4"}} 
+          source={{uri:  postDetails.video}}
+          resizeMode={ResizeMode.CONTAIN}        
+          style={{width:'40%', height: 50, marginRight: 10}}
+        />
+        <Icon name="play-circle" size={28} color={COLORS.orange}/>
+        <Text style={{color: COLORS.orange, fontFamily: FONTS.semiBold, fontSize: 16,}}>Xem video</Text>
+
+        </>
+        :
+        <View style={{marginLeft: 10,alignItems: 'center', marginTop: 5,flex: 1,flexDirection: 'row', justifyContent: 'space-between'}}>
+        <Icon name={status.isPlaying ? "stop-circle" : "play-circle"} size={35} color={COLORS.orange} onPress={()=>   status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()}/>
+        <Text style={{color: COLORS.orange, fontFamily: FONTS.semiBold, fontSize: 16}}>Đóng</Text>
+        </View>
+        }
+    
+        </TouchableOpacity>
+      </View>
+          <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }}>
             {postDetails.title}.
           </Text>
 
@@ -695,10 +721,13 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: 320,
     height: 200,
+    backgroundColor: COLORS.black
+
   },
   buttons: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    marginBottom: 15,
   },
 });

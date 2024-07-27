@@ -204,7 +204,7 @@ const ProfileScreen = ({ navigation }) => {
             style={styles.topButton}
             onPress={() => navigation.navigate("HelpCenter")}
           >
-            <Image source={{uri: "https://www.clipartmax.com/png/middle/192-1921774_services-call-center.png"}} 
+            <Image source={{uri: "https://virtualshowroom.lixil.com/vn/hanoi/wp-content/uploads/2021/03/icon.png"}} 
               width={35} height={35} resizeMode="cover" style={{borderRadius: 150}}
           />
           </TouchableOpacity>

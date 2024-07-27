@@ -127,6 +127,8 @@ const CreatePostScreen = ({navigation}) => {
     
         if (!result.canceled) {
           setVideo(result.assets[0]);
+          setImages([...images, result.assets[0]]);
+
         }
       };
 
@@ -156,7 +158,6 @@ const CreatePostScreen = ({navigation}) => {
           const createPost = async () => {
             try {
               const formCreatePost = new FormData();
-
               images.forEach((image) => {
                 const localUri = image.uri;
                 const filename = localUri.split("/").pop();
@@ -165,13 +166,37 @@ const CreatePostScreen = ({navigation}) => {
                 console.log("Local Uri: ", localUri);
                 console.log("File Name: ", filename);
                 console.log("File Extension: ", fileExtension);
+
+
+                let type;
+                if (fileExtension === 'jpg' || fileExtension === 'jpeg' || fileExtension === 'png') {
+                  type = `image/${fileExtension}`;
+                } else if (fileExtension === 'mp4' || fileExtension === 'mov' || fileExtension === 'avi') {
+                  type = `video/${fileExtension}`;
+                } else {
+                  console.error("Unsupported file type: ", fileExtension);
+                  return;
+                }                
           
                 formCreatePost.append("image", {
                   uri: localUri,
                   name: filename,
-                  type: `image/${fileExtension}`,
+                  // type: `image/${fileExtension}`,
+                  type,
                 });
               });
+
+            //   if(video){
+            //   const localUri = video.uri;
+            //   const filename = localUri.split("/").pop();
+            //   const fileExtension = filename.split(".").pop();
+
+            //   formCreatePost.append("video", {
+            //     uri: localUri,
+            //     name: filename,
+            //     type: `video/${fileExtension}`,
+            //   });
+            // }
 
               const author = {
                 id: aboutMe._id,
@@ -192,7 +217,7 @@ const CreatePostScreen = ({navigation}) => {
               formCreatePost.append("fee", calculatePrice());
 
 
-              console.log("formCreatePost nè: ", formCreatePost); 
+              console.log("formCreatePost nè: ", JSON.stringify(formCreatePost,null,2)); 
               const response = await API.postWithHeaders(`/post/`, 
               formCreatePost ,
               {
@@ -206,7 +231,7 @@ const CreatePostScreen = ({navigation}) => {
                 getDataAuthor();
                 showToast();
                 setTitle("");
-                setAdress('');
+                setAdress("");
                 setPhone("");
                 setUtilities("");
                 setPrice("");
@@ -291,6 +316,7 @@ const CreatePostScreen = ({navigation}) => {
               }}
               placeholder="Nhập tiêu đề..."
               onChangeText={(txt)=>setTitle(txt.trim())}
+              value={title}
             />
           </View>
         </View>
@@ -312,7 +338,7 @@ const CreatePostScreen = ({navigation}) => {
               }}
               placeholder="VD: 50 Lê Văn Việt, Hiệp Phú, Quận 9,..."
               onChangeText={(txt)=>setAdress(txt.trim())}
-
+              value={address}
             />
           </View>
         </View>
@@ -334,7 +360,7 @@ const CreatePostScreen = ({navigation}) => {
               }}
               placeholder="Nhập số điện thoại..."
               onChangeText={(txt)=>setPhone(txt.trim())}
-
+              value={phone}
             />
           </View>
         </View>
@@ -356,7 +382,7 @@ const CreatePostScreen = ({navigation}) => {
               }}
               placeholder="VD: Wifi miễn phí, điện nước, gần trường học,..."
               onChangeText={(txt)=>setUtilities(txt.trim())}
-
+              value={utilities}
             />
           </View>
         </View>
@@ -382,7 +408,7 @@ const CreatePostScreen = ({navigation}) => {
               keyboardType="numeric"
               placeholder="VNĐ/tháng"
               onChangeText={(txt)=>setPrice(txt.trim())}
-
+              value={price}
             />
           </View>
         </View>
@@ -405,7 +431,7 @@ const CreatePostScreen = ({navigation}) => {
               keyboardType="numeric"
               placeholder="Nhập diện tích..."
               onChangeText={(txt)=>setArea(txt.trim())}
-
+              value={area}
             />
           </View>
         </View>
@@ -430,7 +456,7 @@ const CreatePostScreen = ({navigation}) => {
               maxLength={150}
               numberOfLines={3}
               onChangeText={(txt) => setDescription(txt.trim())}
-
+              value={description}
             />
           </View>
 
