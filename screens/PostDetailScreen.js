@@ -178,9 +178,6 @@ const PostDetailScreen = ({ navigation, route }) => {
 
   const setLoad = () => setIsLoading(false);
 
-  React.useEffect(() => {
-     setAutoPlaySwiper(false);
-  }, [status.isPlaying]);
 
   React.useEffect(() => {
     if(user_id) fetchDataAboutMe();
@@ -227,8 +224,7 @@ const PostDetailScreen = ({ navigation, route }) => {
             ))}
           </Swiper>
           <View
-                  style={{elevation: 2, position: 'absolute', right: 10, bottom: 50, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}
-              >
+             style={{elevation: 2, position: 'absolute', right: 10, bottom: 50, backgroundColor: COLORS.orange, padding: 10, borderRadius: 8 }}>
                   <Text style={{fontFamily: FONTS.bold, color: COLORS.white, fontSize: 17}}>{formatCurrency(postDetails.price)}</Text>
               </View>
         </View>
@@ -308,7 +304,8 @@ const PostDetailScreen = ({ navigation, route }) => {
             marginBottom: 120,
           }}
         >
-        {showVideo &&
+      {showVideo &&
+        <>
         <Video
         ref={video}
         style={styles.video}
@@ -320,37 +317,39 @@ const PostDetailScreen = ({ navigation, route }) => {
         isLooping
         onPlaybackStatusUpdate={status => setStatus(() => status)}
         />
+        <View style={{marginHorizontal: 10,alignItems: 'center', marginTop: 5,flex: 1,flexDirection: 'row', justifyContent: 'space-between'}}>
+        <Icon name={status.isPlaying ? "stop-circle" : "play-circle"} size={35} color={COLORS.orange} onPress={()=>   {status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()}}/>
+        <Text 
+        onPress={() =>{
+          setShowVideo(!showVideo)
         }
-          <View style={styles.buttons}>
+        }
+        style={{color: COLORS.orange, fontFamily: FONTS.semiBold, fontSize: 16}}>Đóng</Text>
+        </View>
+        </>
+        }
+    {!showVideo && postDetails.video &&
+      <View style={styles.buttons}>
         <TouchableOpacity
         activeOpacity={0.8}
         style={{flexDirection: 'row', alignItems: 'center',backgroundColor: COLORS.white, marginRight: 10, borderColor: COLORS.orange}}
-        onPress={() =>
+        onPress={() =>{
           // status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()
           setShowVideo(!showVideo)
+          setAutoPlaySwiper(false);
         }
-        > 
-        {!showVideo && postDetails.video ?
-        <>
+        }> 
         <Video 
           // source={{uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4"}} 
           source={{uri:  postDetails.video}}
           resizeMode={ResizeMode.CONTAIN}        
-          style={{width:'40%', height: 50, marginRight: 10}}
+          style={{width:'40%', height: 50, marginRight: 10}}          
         />
         <Icon name="play-circle" size={28} color={COLORS.orange}/>
         <Text style={{color: COLORS.orange, fontFamily: FONTS.semiBold, fontSize: 16,}}>Xem video</Text>
-
-        </>
-        :
-        <View style={{marginLeft: 10,alignItems: 'center', marginTop: 5,flex: 1,flexDirection: 'row', justifyContent: 'space-between'}}>
-        <Icon name={status.isPlaying ? "stop-circle" : "play-circle"} size={35} color={COLORS.orange} onPress={()=>   status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()}/>
-        <Text style={{color: COLORS.orange, fontFamily: FONTS.semiBold, fontSize: 16}}>Đóng</Text>
-        </View>
-        }
-    
         </TouchableOpacity>
       </View>
+}
           <Text style={{ fontFamily: FONTS.semiBold, fontSize: 16 }}>
             {postDetails.title}.
           </Text>

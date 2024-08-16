@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
         if (user) {
           console.log("User is authenticated:", user);
           try {
-            await loginSystem(user,null);
+            await loginSystem(user);
           } catch (error) {
             console.error('Error during login system: ', error);
           } finally {
@@ -57,15 +57,14 @@ export const AuthProvider = ({ children }) => {
     return subscriber; // unsubscribe on unmount
   }, []);
 
-  const loginSystem = async (user, photoURL) => {
+  const loginSystem = async (user) => {
     console.log("User at loginsystem: ", JSON.stringify(user, null,2));
     let providerId = user.providerData[0].providerId;
-    console.log("Photo URL Facebook ở login system: ", photoURL)
     try {
       const response = await API.post('/account/login', {
         email: providerId === "facebook.com" ? user.providerData[0].email : user.email,
         displayName: user.displayName,
-        photoURL: providerId === "facebook.com" ? photoURL : user.photoURL,
+        photoURL: user.photoURL,
       });
       if(response){
         console.log('User saved to database: ', response.data.data);
@@ -82,12 +81,10 @@ export const AuthProvider = ({ children }) => {
     const { idToken } = await GoogleSignin.signIn();
     setInitializing(true);
     const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-    // return auth().signInWithCredential(googleCredential);
     const userCredential = await auth().signInWithCredential(googleCredential);
-    if (userCredential) {
-      await loginSystem(userCredential.user, null);
-    }
-
+    // if (userCredential) {
+    //   await loginSystem(userCredential.user, null);
+    // }
     return userCredential;
     
   };
@@ -104,16 +101,12 @@ export const AuthProvider = ({ children }) => {
       if (!data) {
         throw 'Something went wrong obtaining access token';
       }
-  
       const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
-
       const userCredential = await auth().signInWithCredential(facebookCredential);
-
-      if (userCredential) {
-        console.log("User info login Facebook: ", JSON.stringify(userCredential, null, 2));
-        await loginSystem(userCredential.user, userCredential.additionalUserInfo.profile.picture.data.url);
-      }
-  
+      // if (userCredential) {
+      //   console.log("User info login Facebook: ", JSON.stringify(userCredential, null, 2));
+      //   await loginSystem(userCredential.user, userCredential.additionalUserInfo.profile.picture.data.url);
+      // }
       return userCredential;
 
     } catch (error) {
